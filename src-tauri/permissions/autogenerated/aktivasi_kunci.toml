@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-aktivasi-kunci"
+description = "Enables the aktivasi_kunci command without any pre-configured scope."
+commands.allow = ["aktivasi_kunci"]
+
+[[permission]]
+identifier = "deny-aktivasi-kunci"
+description = "Denies the aktivasi_kunci command without any pre-configured scope."
+commands.deny = ["aktivasi_kunci"]

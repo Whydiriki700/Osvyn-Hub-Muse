@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-simpan-bahasa"
+description = "Enables the simpan_bahasa command without any pre-configured scope."
+commands.allow = ["simpan_bahasa"]
+
+[[permission]]
+identifier = "deny-simpan-bahasa"
+description = "Denies the simpan_bahasa command without any pre-configured scope."
+commands.deny = ["simpan_bahasa"]

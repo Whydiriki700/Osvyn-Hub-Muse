@@ -1,0 +1,20 @@
+[package]
+name = "osvyn"
+version = "0.2.9"
+description = "Osvyn - pengelola multi-akun untuk Muse, versi jualan dengan aktivasi MuseKey"
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["tray-icon", "unstable"] }
+tauri-plugin-single-instance = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+ed25519-dalek = "2"
+ureq = { version = "2", features = ["json"] }
+sha2 = "0.10"
+
+[profile.release]
+strip = true

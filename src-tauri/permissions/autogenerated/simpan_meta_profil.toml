@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-simpan-meta-profil"
+description = "Enables the simpan_meta_profil command without any pre-configured scope."
+commands.allow = ["simpan_meta_profil"]
+
+[[permission]]
+identifier = "deny-simpan-meta-profil"
+description = "Denies the simpan_meta_profil command without any pre-configured scope."
+commands.deny = ["simpan_meta_profil"]

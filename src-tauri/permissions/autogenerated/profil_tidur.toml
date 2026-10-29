@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-profil-tidur"
+description = "Enables the profil_tidur command without any pre-configured scope."
+commands.allow = ["profil_tidur"]
+
+[[permission]]
+identifier = "deny-profil-tidur"
+description = "Denies the profil_tidur command without any pre-configured scope."
+commands.deny = ["profil_tidur"]

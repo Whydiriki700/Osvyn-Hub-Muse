@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Osvyn: Menyiapkan</title>
+<style>
+  html, body { margin:0; padding:0; height:100%; background:#ffffff; overflow:hidden; }
+  body { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:20px;
+         cursor:pointer; font-family:Poppins, "Segoe UI", system-ui, sans-serif;
+         -webkit-user-select:none; user-select:none; }
+  #bungkus { display:flex; flex-direction:column; align-items:center; gap:20px;
+             animation: keluar .45s ease 1.65s forwards; }
+  #nama { font-weight:700; font-size:44px; letter-spacing:-1px; color:#101014; opacity:0;
+          animation: masuk .8s cubic-bezier(.22,.8,.3,1) .1s forwards; }
+  #nama .titik { display:inline-block; width:9px; height:9px; border-radius:50%; background:#15b3da; margin-left:4px; }
+  @keyframes masuk { from { opacity:0; transform:scale(.96) translateY(8px); } to { opacity:1; transform:scale(1) translateY(0); } }
+  @keyframes keluar { from { opacity:1; } to { opacity:0; } }
+  #teks { font-size:15px; font-weight:600; letter-spacing:.3px; color:#3c3c44; opacity:0;
+          animation: masuk .8s cubic-bezier(.22,.8,.3,1) .3s forwards; }
+  .titik3 { display:inline-block; width:1.2em; text-align:left; }
+  .titik3::after { content:''; animation: titik 1.2s steps(4) infinite; }
+  @keyframes titik { 0% { content:''; } 25% { content:'.'; } 50% { content:'..'; } 75% { content:'...'; } }
+  #garis { width:150px; height:3px; border-radius:99px; background:#e8e8ee; overflow:hidden; opacity:0;
+           animation: masuk .8s ease .45s forwards; }
+  #garis i { display:block; height:100%; width:0; border-radius:99px; background:#15b3da;
+             animation: muat 1.7s cubic-bezier(.22,.8,.3,1) .45s forwards; }
+  @keyframes muat { from { width:0; } to { width:82%; } }
+</style>
+</head>
+<body>
+  <div id="bungkus">
+    <div id="nama">Osvyn<span class="titik"></span></div>
+    <div id="teks">Preparing new profile<span class="titik3"></span></div>
+    <div id="garis"><i></i></div>
+  </div>
+<script>
+  var TEKS = { en:"Preparing new profile", id:"Menyiapkan profil baru",
+    es:"Preparando el perfil nuevo", pt:"Preparando o novo perfil",
+    fr:"Préparation du nouveau profil", de:"Neues Profil wird vorbereitet",
+    it:"Preparazione del nuovo profilo", ru:"Подготовка нового профиля",
+    ar:"جارٍ تجهيز الملف الجديد", tr:"Yeni profil hazırlanıyor",
+    hi:"नई प्रोफ़ाइल तैयार हो रही है", zh:"正在准备新档案",
+    ja:"新しいプロフィールを準備中", ko:"새 프로필 준비 중" };
+  try {
+    window.__TAURI__.core.invoke('ambil_bahasa').then(function(kode){
+      if (TEKS[kode]) {
+        document.getElementById('teks').innerHTML =
+          TEKS[kode] + '<span class="titik3"></span>';
+      }
+    }).catch(function(){});
+  } catch (e) {}
+  var selesai = false;
+  function tutup() {
+    if (selesai) return; selesai = true;
+    try { window.__TAURI__.core.invoke('tutup_splash'); } catch (e) {}
+  }
+  document.addEventListener('click', tutup);
+  setTimeout(tutup, 2100);
+</script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-ganti-nama"
+description = "Enables the ganti_nama command without any pre-configured scope."
+commands.allow = ["ganti_nama"]
+
+[[permission]]
+identifier = "deny-ganti-nama"
+description = "Denies the ganti_nama command without any pre-configured scope."
+commands.deny = ["ganti_nama"]

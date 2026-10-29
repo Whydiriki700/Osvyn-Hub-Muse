@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-tidurkan-semua"
+description = "Enables the tidurkan_semua command without any pre-configured scope."
+commands.allow = ["tidurkan_semua"]
+
+[[permission]]
+identifier = "deny-tidurkan-semua"
+description = "Denies the tidurkan_semua command without any pre-configured scope."
+commands.deny = ["tidurkan_semua"]

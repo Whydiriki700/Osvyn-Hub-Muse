@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Osvyn: Activation</title>
+<style>
+  :root{ --ink:#101014; --ink-2:#3c3f47; --ink-3:#83878f; --garis:#e2e2e8; --biru:#2b6ff2; --biru-gelap:#1e56c8; --cyan:#15b3da; --merah:#c62f3b; }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html, body{ height:100%; }
+  body{ font-family:"Segoe UI", system-ui, sans-serif; background:#ffffff; color:var(--ink);
+        display:flex; align-items:center; justify-content:center; -webkit-user-select:none; user-select:none; }
+  #bahasa{ position:fixed; top:16px; inset-inline-end:16px; font-size:13px; color:var(--ink-2);
+           border:1px solid var(--garis); border-radius:9px; padding:6px 8px; background:#fff; outline:none; cursor:pointer; }
+  .kotak{ width:440px; max-width:92vw; text-align:center; padding:24px; }
+  .nama{ font-family:Poppins, "Segoe UI", system-ui, sans-serif; font-weight:700; font-size:44px; letter-spacing:-1px; }
+  .nama .titik{ display:inline-block; width:11px; height:11px; border-radius:50%; background:var(--cyan); margin-left:4px; }
+  .jargon{ font-size:13.5px; color:var(--ink-3); margin-top:2px; }
+  .judul{ font-size:19px; font-weight:600; margin-top:38px; }
+  .penjelas{ font-size:14px; line-height:1.65; color:var(--ink-2); margin-top:10px; }
+  label{ display:block; text-align:start; font-size:13px; font-weight:600; margin:26px 0 8px; }
+  input#kunci{ width:100%; border:1px solid var(--garis); border-radius:12px; padding:13px 14px;
+            font-family:Consolas, "Courier New", monospace; font-size:13px; line-height:1.4;
+            outline:none; color:var(--ink); background:#fbfbfc; }
+  input#kunci:focus{ border-color:var(--biru); background:#fff; }
+  button{ width:100%; margin-top:14px; background:var(--biru); color:#fff; border:none; border-radius:12px;
+          padding:14px; font-size:15px; font-weight:600; cursor:pointer;
+          transition:transform .12s ease, background-color .18s ease, opacity .18s ease, box-shadow .18s ease; }
+  button:hover{ background:var(--biru-gelap); }
+  button:active{ transform:scale(.97); }
+  button:disabled{ opacity:.5; cursor:default; }
+  button:disabled:active{ transform:none; }
+  #bahasa{ transition:transform .12s ease, border-color .18s ease, background-color .18s ease; }
+  #bahasa:active{ transform:scale(.97); }
+  .galat{ display:none; margin-top:14px; font-size:13.5px; color:var(--merah); line-height:1.55; }
+  .kaki{ margin-top:26px; font-size:12.5px; color:var(--ink-3); line-height:1.7; }
+  .berhasil{ display:none; }
+  .berhasil .judul{ color:var(--biru-gelap); margin-top:38px; }
+</style>
+</head>
+<body>
+  <select id="bahasa" aria-label="Language">
+    <option value="en">English</option>
+    <option value="id">Bahasa Indonesia</option>
+    <option value="es">Español</option>
+    <option value="pt">Português</option>
+    <option value="fr">Français</option>
+    <option value="de">Deutsch</option>
+    <option value="it">Italiano</option>
+    <option value="ru">Русский</option>
+    <option value="ar">العربية</option>
+    <option value="tr">Türkçe</option>
+    <option value="hi">हिन्दी</option>
+    <option value="zh">中文</option>
+    <option value="ja">日本語</option>
+    <option value="ko">한국어</option>
+  </select>
+  <div class="kotak">
+    <div class="nama">Osvyn<span class="titik"></span></div>
+    <div class="jargon" id="t-jargon"></div>
+
+    <div id="formulir">
+      <div class="judul" id="t-judul"></div>
+      <p class="penjelas" id="t-penjelas"></p>
+      <label for="kunci" id="t-label"></label>
+      <input id="kunci" type="text" placeholder="OSV1-XXXX-XXXX-XXXX-..." spellcheck="false" autocomplete="off">
+      <button id="tombol"></button>
+      <p class="galat" id="galat"></p>
+      <p class="kaki"><span id="t-kaki1"></span><br><span id="t-kaki2"></span></p>
+    </div>
+
+    <div class="berhasil" id="berhasil">
+      <div class="judul" id="t-berhasil-judul"></div>
+      <p class="penjelas" id="teks-berhasil"></p>
+    </div>
+  </div>
+<script>
+  var KATA = {
+    en: { jargon:"Multi-account manager for Muse", judul:"Activate Osvyn",
+      penjelas:"This app is locked. Enter the MuseKey you received by email after purchase to unlock it. Activation is one-time on each computer.",
+      label:"MuseKey", tombol:"Activate", memeriksa:"Checking...",
+      kosong:"Paste the MuseKey from your purchase email first.",
+      kaki1:"Don't have a key yet? Get Osvyn on the official purchase page.",
+      kaki2:"One key works on as many PCs as your plan includes.",
+      berhasilJudul:"Activation successful",
+      berhasilTeks:"Plan {tier} is active. The app restarts and opens in full for you.",
+      errInvalid:"Invalid key. Double-check the key from your purchase email.",
+      errFormat:"Unknown key format.", errVersion:"Unsupported key version.",
+      errSave:"Failed to save the license." },
+    id: { jargon:"Pengelola multi-akun untuk Muse", judul:"Aktivasi Osvyn",
+      penjelas:"Aplikasi ini terkunci. Masukkan MuseKey yang Anda terima lewat email sesudah pembayaran untuk membukanya. Aktivasi hanya satu kali di setiap komputer.",
+      label:"MuseKey", tombol:"Aktifkan", memeriksa:"Memeriksa...",
+      kosong:"Tempel dulu MuseKey dari email pembelian Anda.",
+      kaki1:"Belum punya kunci? Dapatkan Osvyn di halaman pembelian resmi.",
+      kaki2:"Satu kunci berlaku sesuai jumlah PC pada paket Anda.",
+      berhasilJudul:"Aktivasi berhasil",
+      berhasilTeks:"Paket {tier} aktif. Aplikasi dimulai ulang dan dibuka penuh untuk Anda.",
+      errInvalid:"Kunci tidak sah. Periksa lagi kunci dari email pembelian Anda.",
+      errFormat:"Format kunci tidak dikenal.", errVersion:"Versi kunci tidak didukung.",
+      errSave:"Gagal menyimpan lisensi." },
+    es: { jargon:"Gestor multicuenta para Muse", judul:"Activar Osvyn",
+      penjelas:"Esta aplicación está bloqueada. Introduce la MuseKey que recibiste por correo tras la compra para desbloquearla. La activación se hace una sola vez en cada equipo.",
+      label:"MuseKey", tombol:"Activar", memeriksa:"Comprobando...",
+      kosong:"Pega primero la MuseKey de tu correo de compra.",
+      kaki1:"¿Aún no tienes una clave? Consigue Osvyn en la página oficial de compra.",
+      kaki2:"Una clave funciona en tantos equipos como incluya tu plan.",
+      berhasilJudul:"Activación correcta",
+      berhasilTeks:"El plan {tier} está activo. La aplicación se reinicia y se abre completa para ti.",
+      errInvalid:"Clave no válida. Revisa la clave de tu correo de compra.",
+      errFormat:"Formato de clave desconocido.", errVersion:"Versión de clave no compatible.",
+      errSave:"No se pudo guardar la licencia." },
+    pt: { jargon:"Gestor multicontas para o Muse", judul:"Ativar o Osvyn",
+      penjelas:"Este aplicativo está bloqueado. Insira a MuseKey que você recebeu por e-mail após a compra para desbloqueá-lo. A ativação é feita uma única vez em cada computador.",
+      label:"MuseKey", tombol:"Ativar", memeriksa:"Verificando...",
+      kosong:"Cole primeiro a MuseKey do seu e-mail de compra.",
+      kaki1:"Ainda não tem uma chave? Adquira o Osvyn na página oficial de compra.",
+      kaki2:"Uma chave funciona em quantos PCs o seu plano incluir.",
+      berhasilJudul:"Ativação concluída",
+      berhasilTeks:"O plano {tier} está ativo. O aplicativo reinicia e abre por completo para você.",
+      errInvalid:"Chave inválida. Confira a chave do seu e-mail de compra.",
+      errFormat:"Formato de chave desconhecido.", errVersion:"Versão de chave não suportada.",
+      errSave:"Falha ao salvar a licença." },
+    fr: { jargon:"Gestionnaire multi-comptes pour Muse", judul:"Activer Osvyn",
+      penjelas:"Cette application est verrouillée. Saisissez la MuseKey reçue par e-mail après l'achat pour la déverrouiller. L'activation se fait une seule fois sur chaque ordinateur.",
+      label:"MuseKey", tombol:"Activer", memeriksa:"Vérification...",
+      kosong:"Collez d'abord la MuseKey de votre e-mail d'achat.",
+      kaki1:"Pas encore de clé ? Obtenez Osvyn sur la page d'achat officielle.",
+      kaki2:"Une clé fonctionne sur le nombre de PC inclus dans votre offre.",
+      berhasilJudul:"Activation réussie",
+      berhasilTeks:"L'offre {tier} est active. L'application redémarre et s'ouvre entièrement pour vous.",
+      errInvalid:"Clé invalide. Vérifiez la clé de votre e-mail d'achat.",
+      errFormat:"Format de clé inconnu.", errVersion:"Version de clé non prise en charge.",
+      errSave:"Échec de l'enregistrement de la licence." },
+    de: { jargon:"Multi-Konto-Manager für Muse", judul:"Osvyn aktivieren",
+      penjelas:"Diese App ist gesperrt. Gib den MuseKey ein, den du nach dem Kauf per E-Mail erhalten hast, um sie zu entsperren. Die Aktivierung erfolgt einmalig auf jedem Computer.",
+      label:"MuseKey", tombol:"Aktivieren", memeriksa:"Wird geprüft...",
+      kosong:"Füge zuerst den MuseKey aus deiner Kauf-E-Mail ein.",
+      kaki1:"Noch kein Schlüssel? Hol dir Osvyn auf der offiziellen Kaufseite.",
+      kaki2:"Ein Schlüssel gilt für so viele PCs, wie dein Tarif umfasst.",
+      berhasilJudul:"Aktivierung erfolgreich",
+      berhasilTeks:"Der Tarif {tier} ist aktiv. Die App startet neu und öffnet sich vollständig für dich.",
+      errInvalid:"Ungültiger Schlüssel. Prüfe den Schlüssel aus deiner Kauf-E-Mail.",
+      errFormat:"Unbekanntes Schlüsselformat.", errVersion:"Nicht unterstützte Schlüsselversion.",
+      errSave:"Die Lizenz konnte nicht gespeichert werden." },
+    it: { jargon:"Gestore multi-account per Muse", judul:"Attiva Osvyn",
+      penjelas:"Questa app è bloccata. Inserisci la MuseKey ricevuta via email dopo l'acquisto per sbloccarla. L'attivazione si fa una sola volta su ogni computer.",
+      label:"MuseKey", tombol:"Attiva", memeriksa:"Verifica in corso...",
+      kosong:"Incolla prima la MuseKey dalla tua email di acquisto.",
+      kaki1:"Non hai ancora una chiave? Ottieni Osvyn sulla pagina ufficiale di acquisto.",
+      kaki2:"Una chiave funziona su tutti i PC inclusi nel tuo piano.",
+      berhasilJudul:"Attivazione riuscita",
+      berhasilTeks:"Il piano {tier} è attivo. L'app si riavvia e si apre per intero.",
+      errInvalid:"Chiave non valida. Ricontrolla la chiave dalla tua email di acquisto.",
+      errFormat:"Formato chiave sconosciuto.", errVersion:"Versione chiave non supportata.",
+      errSave:"Impossibile salvare la licenza." },
+    ru: { jargon:"Менеджер нескольких аккаунтов для Muse", judul:"Активация Osvyn",
+      penjelas:"Приложение заблокировано. Введите MuseKey, полученный по почте после покупки, чтобы разблокировать его. Активация выполняется один раз на каждом компьютере.",
+      label:"MuseKey", tombol:"Активировать", memeriksa:"Проверка...",
+      kosong:"Сначала вставьте MuseKey из письма о покупке.",
+      kaki1:"Ещё нет ключа? Приобретите Osvyn на официальной странице покупки.",
+      kaki2:"Один ключ работает на количестве компьютеров, включённом в ваш тариф.",
+      berhasilJudul:"Активация выполнена",
+      berhasilTeks:"Тариф {tier} активен. Приложение перезапустится и откроется полностью.",
+      errInvalid:"Недействительный ключ. Проверьте ключ из письма о покупке.",
+      errFormat:"Неизвестный формат ключа.", errVersion:"Неподдерживаемая версия ключа.",
+      errSave:"Не удалось сохранить лицензию." },
+    ar: { jargon:"مدير حسابات متعددة لـ Muse", judul:"تفعيل Osvyn",
+      penjelas:"هذا التطبيق مقفل. أدخل MuseKey الذي وصلك عبر البريد الإلكتروني بعد الشراء لفتحه. يتم التفعيل مرة واحدة على كل جهاز كمبيوتر.",
+      label:"MuseKey", tombol:"تفعيل", memeriksa:"جارٍ التحقق...",
+      kosong:"الصق أولاً MuseKey من بريد الشراء الخاص بك.",
+      kaki1:"ليس لديك مفتاح بعد؟ احصل على Osvyn من صفحة الشراء الرسمية.",
+      kaki2:"يعمل مفتاح واحد على عدد أجهزة الكمبيوتر المشمولة في خطتك.",
+      berhasilJudul:"تم التفعيل بنجاح",
+      berhasilTeks:"خطة {tier} مفعّلة. سيُعاد تشغيل التطبيق ويفتح لك بالكامل.",
+      errInvalid:"مفتاح غير صالح. تحقق من المفتاح في بريد الشراء.",
+      errFormat:"تنسيق مفتاح غير معروف.", errVersion:"إصدار مفتاح غير مدعوم.",
+      errSave:"فشل حفظ الترخيص." },
+    tr: { jargon:"Muse için çok hesaplı yönetici", judul:"Osvyn'i Etkinleştir",
+      penjelas:"Bu uygulama kilitli. Kilidi açmak için satın alma sonrasında e-postayla aldığınız MuseKey'i girin. Etkinleştirme her bilgisayarda bir kez yapılır.",
+      label:"MuseKey", tombol:"Etkinleştir", memeriksa:"Kontrol ediliyor...",
+      kosong:"Önce satın alma e-postanızdaki MuseKey'i yapıştırın.",
+      kaki1:"Henüz anahtarınız yok mu? Osvyn'i resmi satın alma sayfasından edinin.",
+      kaki2:"Bir anahtar, planınızın kapsadığı sayıda bilgisayarda çalışır.",
+      berhasilJudul:"Etkinleştirme başarılı",
+      berhasilTeks:"{tier} planı etkin. Uygulama yeniden başlar ve sizin için tam olarak açılır.",
+      errInvalid:"Geçersiz anahtar. Satın alma e-postanızdaki anahtarı kontrol edin.",
+      errFormat:"Bilinmeyen anahtar biçimi.", errVersion:"Desteklenmeyen anahtar sürümü.",
+      errSave:"Lisans kaydedilemedi." },
+    hi: { jargon:"Muse के लिए मल्टी-अकाउंट मैनेजर", judul:"Osvyn सक्रिय करें",
+      penjelas:"यह ऐप लॉक है। इसे खोलने के लिए खरीद के बाद ईमेल से मिली MuseKey डालें। हर कंप्यूटर पर सक्रियण एक ही बार होता है।",
+      label:"MuseKey", tombol:"सक्रिय करें", memeriksa:"जाँच हो रही है...",
+      kosong:"पहले अपनी खरीद ईमेल की MuseKey चिपकाएँ।",
+      kaki1:"अभी कुंजी नहीं है? Osvyn आधिकारिक खरीद पृष्ठ से लें।",
+      kaki2:"एक कुंजी उतने PC पर काम करती है जितने आपकी योजना में शामिल हैं।",
+      berhasilJudul:"सक्रियण सफल",
+      berhasilTeks:"{tier} योजना सक्रिय है। ऐप फिर से शुरू होकर आपके लिए पूरी तरह खुलेगा।",
+      errInvalid:"अमान्य कुंजी। अपनी खरीद ईमेल की कुंजी जाँचें।",
+      errFormat:"अज्ञात कुंजी प्रारूप।", errVersion:"असमर्थित कुंजी संस्करण।",
+      errSave:"लाइसेंस सहेजने में विफल।" },
+    zh: { jargon:"Muse 多账户管理器", judul:"激活 Osvyn",
+      penjelas:"此应用已锁定。输入购买后通过电子邮件收到的 MuseKey 即可解锁。每个电脑只需激活一次。",
+      label:"MuseKey", tombol:"激活", memeriksa:"正在验证...",
+      kosong:"请先粘贴购买邮件中的 MuseKey。",
+      kaki1:"还没有密钥？请在官方购买页面获取 Osvyn。",
+      kaki2:"一个密钥可在您的套餐包含的电脑数量上使用。",
+      berhasilJudul:"激活成功",
+      berhasilTeks:"{tier} 套餐已激活。应用将重启并为您完整打开。",
+      errInvalid:"密钥无效。请核对购买邮件中的密钥。",
+      errFormat:"未知密钥格式。", errVersion:"不支持的密钥版本。",
+      errSave:"保存许可证失败。" },
+    ja: { jargon:"Muse のマルチアカウントマネージャー", judul:"Osvyn を有効化",
+      penjelas:"このアプリはロックされています。購入後にメールで届いた MuseKey を入力して解除してください。有効化はコンピューターごとに一度だけです。",
+      label:"MuseKey", tombol:"有効化", memeriksa:"確認中...",
+      kosong:"まず購入メールの MuseKey を貼り付けてください。",
+      kaki1:"キーをお持ちでない方は、公式購入ページで Osvyn を入手してください。",
+      kaki2:"1つのキーで、プランに含まれる台数の PC で使えます。",
+      berhasilJudul:"有効化が完了しました",
+      berhasilTeks:"{tier} プランが有効です。アプリが再起動し、フルで開きます。",
+      errInvalid:"キーが無効です。購入メールのキーをご確認ください。",
+      errFormat:"不明なキー形式です。", errVersion:"サポートされていないキーのバージョンです。",
+      errSave:"ライセンスの保存に失敗しました。" },
+    ko: { jargon:"Muse 멀티 계정 관리자", judul:"Osvyn 활성화",
+      penjelas:"이 앱은 잠겨 있습니다. 구매 후 이메일로 받은 MuseKey를 입력해 잠금을 해제하세요. 활성화는 컴퓨터마다 한 번만 하면 됩니다.",
+      label:"MuseKey", tombol:"활성화", memeriksa:"확인 중...",
+      kosong:"먼저 구매 이메일의 MuseKey를 붙여넣으세요.",
+      kaki1:"아직 키가 없나요? 공식 구매 페이지에서 Osvyn을 받으세요.",
+      kaki2:"키 하나는 요금제에 포함된 PC 대수만큼 사용할 수 있습니다.",
+      berhasilJudul:"활성화 완료",
+      berhasilTeks:"{tier} 요금제가 활성화되었습니다. 앱이 다시 시작되어 전체 화면으로 열립니다.",
+      errInvalid:"유효하지 않은 키입니다. 구매 이메일의 키를 확인하세요.",
+      errFormat:"알 수 없는 키 형식입니다.", errVersion:"지원되지 않는 키 버전입니다.",
+      errSave:"라이선스 저장에 실패했습니다." }
+  };
+  var bahasa = 'en';
+  var invoke = window.__TAURI__.core.invoke;
+  var tombol = document.getElementById('tombol');
+  var area = document.getElementById('kunci');
+  var galat = document.getElementById('galat');
+  var pemilih = document.getElementById('bahasa');
+
+  function terapkan(kode) {
+    if (!KATA[kode]) kode = 'en';
+    bahasa = kode;
+    var k = KATA[kode];
+    document.documentElement.lang = kode;
+    document.documentElement.dir = (kode === 'ar') ? 'rtl' : 'ltr';
+    document.getElementById('t-jargon').textContent = k.jargon;
+    document.getElementById('t-judul').textContent = k.judul;
+    document.getElementById('t-penjelas').textContent = k.penjelas;
+    document.getElementById('t-label').textContent = k.label;
+    tombol.textContent = k.tombol;
+    document.getElementById('t-kaki1').textContent = k.kaki1;
+    document.getElementById('t-kaki2').textContent = k.kaki2;
+    document.getElementById('t-berhasil-judul').textContent = k.berhasilJudul;
+    pemilih.value = kode;
+  }
+  terapkan('en');
+  invoke('ambil_bahasa').then(function(kode){ terapkan(kode); }).catch(function(){});
+  pemilih.addEventListener('change', function(){
+    terapkan(pemilih.value);
+    invoke('simpan_bahasa', { kode: pemilih.value }).catch(function(){});
+  });
+
+  function tampilGalat(pesan) {
+    galat.textContent = pesan;
+    galat.style.display = 'block';
+    tombol.disabled = false;
+    tombol.textContent = KATA[bahasa].tombol;
+  }
+  function terjemahGalat(e) {
+    var s = String(e), k = KATA[bahasa];
+    if (s.indexOf('Invalid key') === 0) return k.errInvalid;
+    if (s.indexOf('Unknown key format') === 0) return k.errFormat;
+    if (s.indexOf('Unsupported key version') === 0) return k.errVersion;
+    if (s.indexOf('Failed to save') === 0) return k.errSave;
+    return s;
+  }
+  tombol.addEventListener('click', function () {
+    var kunci = area.value.trim();
+    if (!kunci) { tampilGalat(KATA[bahasa].kosong); return; }
+    galat.style.display = 'none';
+    tombol.disabled = true;
+    tombol.textContent = KATA[bahasa].memeriksa;
+    invoke('aktivasi_kunci', { kunci: kunci })
+      .then(function (tingkat) {
+        document.getElementById('formulir').style.display = 'none';
+        var b = document.getElementById('berhasil');
+        b.style.display = 'block';
+        document.getElementById('teks-berhasil').textContent =
+          KATA[bahasa].berhasilTeks.replace('{tier}', tingkat);
+      })
+      .catch(function (e) { tampilGalat(terjemahGalat(e)); });
+  });
+  area.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Enter') { tombol.click(); }
+  });
+</script>
+</body>
+</html>

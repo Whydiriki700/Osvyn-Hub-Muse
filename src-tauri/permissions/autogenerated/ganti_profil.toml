@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-ganti-profil"
+description = "Enables the ganti_profil command without any pre-configured scope."
+commands.allow = ["ganti_profil"]
+
+[[permission]]
+identifier = "deny-ganti-profil"
+description = "Denies the ganti_profil command without any pre-configured scope."
+commands.deny = ["ganti_profil"]

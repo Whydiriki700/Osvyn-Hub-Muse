@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-data-hub"
+description = "Enables the data_hub command without any pre-configured scope."
+commands.allow = ["data_hub"]
+
+[[permission]]
+identifier = "deny-data-hub"
+description = "Denies the data_hub command without any pre-configured scope."
+commands.deny = ["data_hub"]

@@ -1,0 +1,1 @@
+{"$schema": "../gen/schemas/desktop-schema.json", "description": "Webview profil (muse.ai) boleh memanggil perintah unduhan blob lewat jembatan", "identifier": "unduhan", "remote": {"urls": ["https://muse.ai/*"]}, "permissions": ["core:default", "allow-simpan-unduhan-blob", "allow-catat-jembatan-unduhan"], "webviews": ["profil-*"]}

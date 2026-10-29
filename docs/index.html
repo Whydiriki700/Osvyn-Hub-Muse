@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Osvyn — Multi-Account Workspace for Muse</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --surface-2: #f3f4f6;
+    --surface-dark: #09090b;
+    --ink: #09090b;
+    --ink-2: #3f3f46;
+    --ink-3: #71717a;
+    --border: #e4e4e7;
+    --border-strong: #d4d4d8;
+    --accent: #2563eb;
+    --accent-hover: #1d4ed8;
+    --accent-soft: #eff6ff;
+    --green: #10b981;
+    --amber: #f59e0b;
+    --purple: #8b5cf6;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--font-sans);
+    color: var(--ink);
+    background-color: var(--bg);
+    background-image: radial-gradient(#d4d4d8 1px, transparent 1px);
+    background-size: 24px 24px;
+    background-position: 0 0;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+  }
+
+  /* Subtle mask over dot background so it doesn't overwhelm */
+  .bg-wrapper {
+    background: linear-gradient(180deg, rgba(250,250,250,0.4) 0%, rgba(250,250,250,0.95) 35%, var(--bg) 100%);
+  }
+
+  .bungkus { max-width: 1140px; margin: 0 auto; padding: 0 24px; }
+
+  /* Typography & Utilities */
+  .mono { font-family: var(--font-mono); }
+  kbd {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    font-weight: 600;
+    background: var(--surface-2);
+    border: 1px solid var(--border-strong);
+    border-bottom-width: 2px;
+    border-radius: 5px;
+    padding: 2px 6px;
+    color: var(--ink);
+    display: inline-block;
+    line-height: 1.2;
+  }
+
+  /* Header */
+  header {
+    position: sticky;
+    top: 0;
+    background: rgba(250, 250, 250, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    z-index: 50;
+  }
+  .kepala { display: flex; align-items: center; justify-content: space-between; height: 68px; }
+  .merek { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; }
+  .nama { font-weight: 800; font-size: 20px; letter-spacing: -0.6px; display: flex; align-items: center; gap: 8px; }
+  .os-badge {
+    font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+    background: var(--surface-2); border: 1px solid var(--border);
+    padding: 2px 6px; border-radius: 4px; color: var(--ink-3); letter-spacing: 0;
+  }
+  nav { display: flex; align-items: center; gap: 24px; }
+  nav a.tautan { color: var(--ink-2); text-decoration: none; font-size: 14px; font-weight: 600; transition: color .15s; }
+  nav a.tautan:hover { color: var(--ink); }
+
+  .pilih {
+    font-family: var(--font-sans); font-size: 13px; font-weight: 600; color: var(--ink-2);
+    border: 1px solid var(--border-strong); background: var(--surface);
+    border-radius: var(--radius-sm); padding: 7px 10px; cursor: pointer;
+    outline: none; transition: border-color .15s;
+  }
+  .pilih:hover { border-color: var(--ink-3); }
+
+  .tombol {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    background: var(--ink); color: #fff; border: 1px solid var(--ink);
+    border-radius: var(--radius-sm); padding: 9px 16px; font-size: 13.5px; font-weight: 600;
+    cursor: pointer; text-decoration: none; transition: all .15s ease;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  }
+  .tombol:hover { background: #27272a; transform: translateY(-1px); }
+  .tombol.cyan { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .tombol.cyan:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+  .tombol.putih { background: var(--surface); color: var(--ink); border: 1px solid var(--border-strong); }
+  .tombol.putih:hover { background: var(--surface-2); }
+
+  /* Hero Section */
+  .hero { padding: 64px 0 40px; display: grid; grid-template-columns: 1fr; gap: 24px; }
+  .hero-top { max-width: 740px; }
+  .lencana {
+    display: inline-flex; align-items: center; gap: 8px;
+    border: 1px solid var(--border-strong); background: var(--surface);
+    border-radius: 999px; padding: 5px 14px 5px 10px;
+    font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: var(--ink-2);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+  }
+  .lencana .dot {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--green);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+  }
+  h1 {
+    font-weight: 800; font-size: clamp(38px, 5vw, 58px);
+    line-height: 1.06; letter-spacing: -1.8px; margin: 20px 0 18px; color: var(--ink);
+  }
+  h1 .seru {
+    background: linear-gradient(135deg, var(--accent) 0%, #4f46e5 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .sub { font-size: 17.5px; line-height: 1.65; color: var(--ink-2); max-width: 640px; font-weight: 400; }
+
+  .cta-bar { display: flex; align-items: center; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
+  .cta-bar .tombol { padding: 13px 24px; font-size: 15px; border-radius: 10px; }
+  .mikro {
+    margin-top: 16px; font-size: 12.5px; color: var(--ink-3);
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    font-family: var(--font-mono);
+  }
+  .mikro span { display: inline-flex; align-items: center; gap: 6px; }
+
+  /* Interactive App Window Mockup */
+  .panggung { padding: 12px 0 32px; }
+  .jendela {
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(9, 9, 11, 0.14), 0 0 0 1px rgba(9, 9, 11, 0.04);
+    background: var(--surface);
+  }
+  /* Windows 11 Titlebar */
+  .jbar {
+    display: flex; align-items: center; justify-content: space-between;
+    background: #18181b; color: #a1a1aa;
+    padding: 0 0 0 16px; height: 40px; user-select: none;
+  }
+  .jbar-left { display: flex; align-items: center; gap: 10px; font-family: var(--font-mono); font-size: 12px; }
+  .jbar-icon { width: 14px; height: 14px; border-radius: 3px; background: var(--accent); display: inline-block; }
+  .jbar-center { display: flex; align-items: center; gap: 8px; }
+  .sisa {
+    background: rgba(16, 185, 129, 0.12); color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+    border-radius: 6px; padding: 3px 10px;
+  }
+  .ram-pill {
+    background: #27272a; color: #e4e4e7;
+    font-family: var(--font-mono); font-size: 11px;
+    border-radius: 6px; padding: 3px 10px;
+  }
+  .win-controls { display: flex; height: 100%; }
+  .win-btn {
+    width: 44px; height: 100%; display: grid; place-items: center;
+    color: #a1a1aa; font-size: 12px; cursor: default; transition: background .15s;
+  }
+  .win-btn:hover { background: #27272a; color: #fff; }
+  .win-btn.close:hover { background: #e11d48; color: #fff; }
+
+  /* Profile Tab Bar */
+  .tabbar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 16px; background: #f4f4f5;
+    border-bottom: 1px solid var(--border); flex-wrap: wrap;
+  }
+  .tab {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--surface); border: 1px solid var(--border-strong);
+    border-radius: 8px; padding: 7px 12px; font-size: 13px; font-weight: 600;
+    color: var(--ink-2); cursor: pointer; transition: all .15s;
+    position: relative; overflow: hidden;
+  }
+  .tab::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    background: var(--aura, var(--accent)); opacity: 0.7;
+  }
+  .tab:hover { border-color: var(--ink-3); }
+  .tab.aktif {
+    background: var(--ink); color: #fff; border-color: var(--ink);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  }
+  .tab.aktif::before { opacity: 1; width: 4px; }
+  .tab .hadir { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
+  .tab .tidur { width: 7px; height: 7px; border-radius: 50%; background: #a1a1aa; }
+  .tab small { font-family: var(--font-mono); font-size: 11px; font-weight: 500; color: var(--ink-3); }
+  .tab.aktif small { color: #a1a1aa; }
+  .tab-shortcut {
+    font-family: var(--font-mono); font-size: 10px; padding: 1px 5px;
+    border-radius: 4px; background: rgba(0,0,0,0.06); color: var(--ink-3);
+  }
+  .tab.aktif .tab-shortcut { background: rgba(255,255,255,0.15); color: #e4e4e7; }
+  .tab-add {
+    padding: 7px 11px; border: 1px dashed var(--border-strong);
+    background: transparent; color: var(--ink-3); border-radius: 8px;
+    font-family: var(--font-mono); font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+
+  /* Workspace Body */
+  .isi-grid { display: grid; grid-template-columns: 240px 1fr; min-height: 310px; }
+  .isi-sidebar {
+    border-right: 1px solid var(--border); background: #fafafa; padding: 16px;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .profile-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px;
+  }
+  .profile-card-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .aura-avatar {
+    width: 32px; height: 32px; border-radius: 8px; background: var(--accent);
+    color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 13px;
+  }
+  .profile-meta-title { font-size: 13px; font-weight: 700; color: var(--ink); }
+  .profile-meta-sub { font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); }
+  .session-stat {
+    display: flex; justify-content: space-between; font-size: 11.5px;
+    padding: 6px 0; border-top: 1px solid var(--border); color: var(--ink-2);
+  }
+  .session-stat span:last-child { font-family: var(--font-mono); font-weight: 600; color: var(--ink); }
+
+  .sidebar-hint {
+    font-size: 11.5px; color: var(--ink-3); background: var(--surface-2);
+    padding: 10px; border-radius: 8px; border: 1px solid var(--border); line-height: 1.45;
+  }
+
+  .isi-main { padding: 24px 28px; display: flex; flex-direction: column; justify-content: space-between; background: var(--surface); }
+  .chat-stream { display: flex; flex-direction: column; gap: 14px; }
+  .msg-row { display: flex; gap: 12px; align-items: flex-start; }
+  .msg-badge {
+    font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+    padding: 4px 8px; border-radius: 6px; background: var(--surface-2); color: var(--ink-2);
+    white-space: nowrap; margin-top: 2px;
+  }
+  .msg-badge.muse { background: var(--accent-soft); color: var(--accent); border: 1px solid #bfdbfe; }
+  .balon {
+    border: 1px solid var(--border); background: #fafafa;
+    border-radius: 12px; padding: 14px 16px; max-width: 600px;
+  }
+  .balon p { font-size: 13.5px; color: var(--ink-2); line-height: 1.6; }
+
+  .ketik {
+    display: flex; gap: 10px; align-items: center;
+    border: 1px solid var(--border-strong); border-radius: 10px;
+    padding: 10px 12px; margin-top: 20px; background: var(--surface);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+  }
+  .ketik .palsu { flex: 1; font-size: 13.5px; color: var(--ink-3); }
+  .ketik .kirim {
+    background: var(--ink); color: #fff; border-radius: 6px;
+    font-size: 12px; font-weight: 600; padding: 6px 14px; font-family: var(--font-mono);
+  }
+  .ket-caption {
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
+    font-size: 12.5px; color: var(--ink-3); margin-top: 12px; padding: 0 4px;
+  }
+
+  /* Section Styling */
+  section { padding: 80px 0; border-top: 1px solid var(--border); }
+  .section-head { max-width: 640px; margin-bottom: 40px; }
+  .kicker {
+    font-family: var(--font-mono); font-size: 12px; font-weight: 700;
+    letter-spacing: 1.5px; color: var(--accent); text-transform: uppercase;
+    display: inline-block; margin-bottom: 8px;
+  }
+  h2 { font-weight: 800; font-size: clamp(26px, 3.5vw, 36px); letter-spacing: -1px; line-height: 1.15; margin-bottom: 12px; }
+  .lead { font-size: 16px; color: var(--ink-2); line-height: 1.65; }
+
+  /* Bento Features Grid */
+  .grid-fitur {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  .fitur {
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    padding: 24px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    transition: transform .15s, border-color .15s, box-shadow .15s;
+  }
+  .fitur:hover {
+    border-color: var(--ink);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px -8px rgba(0,0,0,0.07);
+  }
+  .fitur.span-2 { grid-column: span 2; background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%); }
+  .fitur-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .fitur .no {
+    font-family: var(--font-mono); font-size: 12px; font-weight: 700;
+    color: var(--ink-3); background: var(--surface-2);
+    border: 1px solid var(--border); padding: 3px 8px; border-radius: 6px;
+  }
+  .fitur-tag {
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+    color: var(--accent); background: var(--accent-soft); padding: 3px 8px; border-radius: 6px;
+  }
+  .fitur h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.3px; }
+  .fitur p { font-size: 14px; line-height: 1.6; color: var(--ink-2); }
+
+  /* Activation Section */
+  .uji { background: var(--surface); }
+  .langkah { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+  .langkah .kotak {
+    background: var(--bg); border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md); padding: 24px; position: relative;
+  }
+  .langkah .angka {
+    font-family: var(--font-mono); font-weight: 700; font-size: 13px;
+    width: 28px; height: 28px; border-radius: 6px;
+    background: var(--ink); color: #fff; display: grid; place-items: center;
+    margin-bottom: 16px;
+  }
+  .langkah h3 { font-size: 16.5px; font-weight: 700; margin-bottom: 8px; }
+  .langkah p { font-size: 14px; line-height: 1.65; color: var(--ink-2); }
+
+  .banding { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 16px; }
+  .panel {
+    background: var(--bg); border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md); padding: 26px;
+  }
+  .panel.tidak { background: #fafafa; border-style: dashed; }
+  .panel h3 {
+    font-size: 14px; font-family: var(--font-mono); text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 16px; color: var(--ink);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .panel ul { list-style: none; display: grid; gap: 10px; }
+  .panel li {
+    font-size: 14px; color: var(--ink-2); padding-left: 26px;
+    position: relative; line-height: 1.5;
+  }
+  .panel li::before {
+    content: '✓'; position: absolute; left: 0; top: 0;
+    font-family: var(--font-mono); font-weight: 700; color: var(--green);
+  }
+  .panel.tidak li::before {
+    content: '—'; color: var(--ink-3);
+  }
+  .panel li b { color: var(--ink); font-weight: 700; }
+
+  /* Pricing Section */
+  .harga-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; align-items: stretch; }
+  .kartu {
+    background: var(--surface); border: 1px solid var(--border-strong);
+    border-radius: var(--radius-lg); padding: 28px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    position: relative;
+  }
+  .kartu.utama {
+    border: 2px solid var(--ink);
+    box-shadow: 0 20px 40px -15px rgba(0,0,0,0.1);
+  }
+  .pop-badge {
+    position: absolute; top: -12px; right: 24px;
+    background: var(--ink); color: #fff;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+    padding: 4px 10px; border-radius: 999px; letter-spacing: 0.5px;
+  }
+  .kartu .tingkat {
+    font-family: var(--font-mono); font-size: 12px; font-weight: 700;
+    letter-spacing: 1.5px; color: var(--ink-3);
+  }
+  .kartu.utama .tingkat { color: var(--accent); }
+  .kartu .rp {
+    font-family: var(--font-mono); font-size: 38px; font-weight: 800;
+    margin: 12px 0 6px; letter-spacing: -1.5px; color: var(--ink);
+  }
+  .kartu .rp s { font-size: 17px; color: var(--ink-3); font-weight: 500; margin-left: 8px; }
+  .kartu .ket {
+    font-family: var(--font-mono); font-size: 12px; color: var(--ink-3);
+    padding-bottom: 18px; margin-bottom: 18px; border-bottom: 1px solid var(--border);
+  }
+  .kartu p.isi-kartu { font-size: 14px; line-height: 1.65; color: var(--ink-2); margin-bottom: 24px; }
+  .kartu-cta { width: 100%; padding: 12px; font-size: 14px; }
+
+  /* FAQ Section */
+  .faq-layout { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 40px; align-items: start; }
+  details {
+    border: 1px solid var(--border-strong); border-radius: var(--radius-md);
+    padding: 18px 20px; margin-bottom: 12px; background: var(--surface);
+    transition: border-color .15s;
+  }
+  details[open] { border-color: var(--ink); }
+  summary {
+    font-weight: 700; font-size: 15px; cursor: pointer;
+    list-style: none; display: flex; justify-content: space-between; align-items: center;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::after {
+    content: '+'; font-family: var(--font-mono); font-size: 18px;
+    color: var(--ink-3); font-weight: 500;
+  }
+  details[open] summary::after { content: '−'; color: var(--ink); }
+  details p { font-size: 14px; line-height: 1.65; color: var(--ink-2); margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+
+  /* Referral / Getting Started Pass */
+  .pass-box {
+    background: var(--surface-dark); color: #fff;
+    border-radius: var(--radius-lg); padding: 40px;
+    display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 32px; align-items: center;
+    box-shadow: 0 20px 40px -15px rgba(0,0,0,0.2);
+  }
+  .pass-box h2 { color: #fff; margin-top: 6px; }
+  .pass-box p { color: #a1a1aa; font-size: 15px; line-height: 1.65; }
+  .ticket-card {
+    background: #18181b; border: 1px solid #27272a;
+    border-radius: var(--radius-md); padding: 24px;
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .ticket-code-row {
+    display: flex; align-items: center; justify-content: space-between;
+    background: #09090b; border: 1px dashed #3f3f46;
+    border-radius: 10px; padding: 14px 16px;
+  }
+  .ticket-label { font-family: var(--font-mono); font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: #71717a; }
+  #kodeUndangan { font-family: var(--font-mono); font-size: 26px; font-weight: 800; letter-spacing: 4px; color: #34d399; margin-top: 2px; }
+
+  footer { border-top: 1px solid var(--border); padding: 32px 0 48px; background: var(--surface); }
+  .kaki { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-3); }
+  .kaki .disclaimer { flex-basis: 100%; color: var(--ink-3); opacity: 0.85; }
+
+  @media (max-width: 920px) {
+    .grid-fitur { grid-template-columns: 1fr 1fr; }
+    .fitur.span-2 { grid-column: span 2; }
+    .isi-grid { grid-template-columns: 1fr; }
+    .isi-sidebar { border-right: none; border-bottom: 1px solid var(--border); }
+    .langkah, .harga-grid, .banding, .faq-layout, .pass-box { grid-template-columns: 1fr; }
+    nav a.tautan { display: none; }
+    section { padding: 56px 0; }
+  }
+  @media (max-width: 560px) {
+    .grid-fitur { grid-template-columns: 1fr; }
+    .fitur.span-2 { grid-column: span 1; }
+    .win-controls { display: none; }
+    .pass-box { padding: 24px; }
+  }
+</style>
+</head>
+<body>
+<div class="bg-wrapper">
+
+<header>
+  <div class="bungkus kepala">
+    <a href="#" class="merek">
+      <div>
+        <div class="nama">Osvyn <span class="os-badge">WIN 10/11</span></div>
+        <div class="jargon" data-i18n="jargon" style="font-size:11.5px;color:var(--ink-3)">Multi-account manager for Muse</div>
+      </div>
+    </a>
+    <nav>
+      <a class="tautan" href="#fitur" data-i18n="nFitur">Features</a>
+      <a class="tautan" href="#aktivasi" data-i18n="nUji">Activation</a>
+      <a class="tautan" href="#harga" data-i18n="nHarga">Pricing</a>
+      <a class="tautan" href="#faq">FAQ</a>
+      <select class="pilih" id="bahasa" aria-label="Language">
+        <option value="en">EN · USD ($)</option>
+        <option value="id">ID · IDR (Rp)</option>
+      </select>
+      <a class="tombol cyan" href="https://wa.me/6281554034879?text=Hi%2C%20I%20want%20to%20buy%20Osvyn.%20Could%20you%20tell%20me%20how%20to%20order%3F" target="_blank" rel="noopener" data-i18n="ctaHead">Get Now</a>
+    </nav>
+  </div>
+</header>
+
+<div class="bungkus hero">
+  <div class="hero-top">
+    <span class="lencana"><span class="dot"></span><span data-i18n="badge">One-time payment &middot; lifetime license</span></span>
+    <h1 data-i18n="h1">All your Muse accounts, <span class="seru">one window.</span></h1>
+    <p class="sub" data-i18n="sub">Osvyn runs many Muse accounts at the same time in a single Windows app. Each account has its own separate login session, and profiles never interfere with each other. One-time payment, not a subscription.</p>
+    <div class="cta-bar">
+      <a class="tombol cyan" href="https://wa.me/6281554034879?text=Hi%2C%20I%20want%20to%20buy%20Osvyn.%20Could%20you%20tell%20me%20how%20to%20order%3F" target="_blank" rel="noopener" data-i18n="ctaMain">Get Now</a>
+      <a class="tombol putih" href="#aktivasi" data-i18n="ctaHarga">How Activation Works</a>
+    </div>
+    <p class="mikro" data-i18n="mikro">Download the app, activate it with your key, and start working. Activation takes about a minute, and it happens only once.</p>
+  </div>
+</div>
+
+<!-- Interactive Windows App Stage -->
+<div class="bungkus panggung">
+  <div class="jendela">
+    <div class="jbar">
+      <div class="jbar-left">
+        <span class="jbar-icon"></span>
+        <span class="judul" data-i18n="jJudul">Osvyn &middot; app window</span>
+      </div>
+      <div class="jbar-center">
+        <span class="ram-pill" id="ramMeter">RAM 142 MB (1 sleeping)</span>
+        <span class="sisa"><span data-i18n="sisa">License active &middot; Personal</span></span>
+      </div>
+      <div class="win-controls" aria-hidden="true">
+        <div class="win-btn">&#8212;</div>
+        <div class="win-btn">&#9633;</div>
+        <div class="win-btn close">&#10005;</div>
+      </div>
+    </div>
+
+    <!-- Interactive Tabs -->
+    <div class="tabbar" role="tablist">
+      <button type="button" class="tab aktif" data-tab="0" style="--aura:#2563eb">
+        <span class="hadir"></span>
+        <span data-i18n="t1">Work Account</span>
+        <span class="tab-shortcut">Ctrl+1</span>
+      </button>
+      <button type="button" class="tab" data-tab="1" style="--aura:#8b5cf6">
+        <span class="hadir"></span>
+        <span data-i18n="t2">Creator Account</span>
+        <span class="tab-shortcut">Ctrl+2</span>
+      </button>
+      <button type="button" class="tab" data-tab="2" style="--aura:#10b981">
+        <span class="tidur" id="dotTab3"></span>
+        <span data-i18n="t3">Team Account <small>asleep &middot; saving RAM</small></span>
+        <span class="tab-shortcut">Ctrl+3</span>
+      </button>
+      <button type="button" class="tab-add" title="Add a new profile">+ New Profile</button>
+    </div>
+
+    <div class="isi-grid">
+      <div class="isi-sidebar">
+        <div class="profile-card">
+          <div class="profile-card-head">
+            <div class="aura-avatar" id="mockAvatar" style="background:#2563eb">W</div>
+            <div>
+              <div class="profile-meta-title" id="mockProfileName">Work Profile #01</div>
+              <div class="profile-meta-sub" id="mockIsolation">Cookie Jar Isolated</div>
+            </div>
+          </div>
+          <div class="session-stat"><span>Aura ID</span><span id="mockAura">Cobalt Blue</span></div>
+          <div class="session-stat"><span>Status</span><span id="mockStatus" style="color:var(--green)">● Active Session</span></div>
+          <div class="session-stat"><span>MuseKey License</span><span>Active</span></div>
+        </div>
+        <div class="sidebar-hint">
+          💡 <strong>Try it live</strong> Click any profile tab above or press <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> on your keyboard to test QuickSwitch.
+        </div>
+      </div>
+
+      <div class="isi-main">
+        <div class="chat-stream">
+          <div class="msg-row">
+            <span class="msg-badge">SESSION</span>
+            <div class="balon">
+              <p data-i18n="balon" id="mockMessage">Each profile signs in with its own Muse account. Switching accounts takes one click, or press Ctrl+1 to Ctrl+9.</p>
+            </div>
+          </div>
+          <div class="msg-row">
+            <span class="msg-badge muse">MUSE AI</span>
+            <div class="balon" style="background:var(--surface);border-color:var(--border-strong)">
+              <p style="font-family:var(--font-mono);font-size:12.5px;color:var(--ink)" id="mockPromptReply">Ready in isolated workspace. Context, history, and cookies are 100% separated from your other profiles.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="ketik">
+          <span class="palsu" data-i18n="ketik">Write a message for Muse&hellip;</span>
+          <span class="kirim" data-i18n="kirim">Send ↵</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ket-caption">
+    <span data-i18n="caption">Concept view of the Osvyn app. Inactive profiles enter DeepSleep mode and free up RAM.</span>
+    <span class="mono" style="font-size:11.5px">WebView2 Native · Zero Cookie Leakage</span>
+  </div>
+</div>
+
+<!-- Features Section -->
+<section id="fitur">
+  <div class="bungkus">
+    <div class="section-head">
+      <div class="kicker" data-i18n="kFitur">Features</div>
+      <h2 data-i18n="fH2">Built for people who run many accounts</h2>
+      <p class="lead" data-i18n="fLead">More than a pile of tabs. Osvyn manages the sessions, memory, and identity of every Muse account you use each day.</p>
+    </div>
+
+    <div class="grid-fitur">
+      <div class="fitur span-2">
+        <div>
+          <div class="fitur-top"><span class="no">01</span><span class="fitur-tag">CORE ISOLATION</span></div>
+          <h3 data-i18n="f01t">Profiles for Every Account</h3>
+          <p data-i18n="f01d">Add profiles up to your plan limit, up to unlimited on the Hub plan. Each profile is a separate, persistent Muse login session.</p>
+        </div>
+      </div>
+      <div class="fitur span-2">
+        <div>
+          <div class="fitur-top"><span class="no">02</span><span class="fitur-tag">MEMORY ENGINE</span></div>
+          <h3 data-i18n="f02t">DeepSleep RAM Saving</h3>
+          <p data-i18n="f02d">A profile that stays inactive for 3 minutes goes to sleep and frees its RAM. One click wakes it back up.</p>
+        </div>
+      </div>
+      <div class="fitur">
+        <div>
+          <div class="fitur-top"><span class="no">03</span><kbd>Ctrl+1..9</kbd></div>
+          <h3 data-i18n="f03t">QuickSwitch</h3>
+          <p data-i18n="f03d">Move between profiles as fast as you change your mind Ctrl+1 to Ctrl+9, no mouse, no reload wait.</p>
+        </div>
+      </div>
+      <div class="fitur">
+        <div>
+          <div class="fitur-top"><span class="no">04</span><span style="display:flex;gap:4px"><span style="width:10px;height:10px;border-radius:50%;background:#2563eb"></span><span style="width:10px;height:10px;border-radius:50%;background:#8b5cf6"></span><span style="width:10px;height:10px;border-radius:50%;background:#10b981"></span></span></div>
+          <h3 data-i18n="f04t">Aura ID &amp; Presence Dot</h3>
+          <p data-i18n="f04d">Every profile carries its own identity color and presence dot, so you always know which account is active, asleep, or open.</p>
+        </div>
+      </div>
+      <div class="fitur">
+        <div>
+          <div class="fitur-top"><span class="no">05</span></div>
+          <h3 data-i18n="f05t">AutoResume</h3>
+          <p data-i18n="f05d">The app remembers your last profile and tab layout. Reopen it and everything is exactly where you left it.</p>
+        </div>
+      </div>
+      <div class="fitur">
+        <div>
+          <div class="fitur-top"><span class="no">06</span></div>
+          <h3 data-i18n="f06t">Profile Vault</h3>
+          <p data-i18n="f06d">Back up and restore your profile list. Moving to a new computer no longer means rebuilding everything from zero.</p>
+        </div>
+      </div>
+      <div class="fitur span-2">
+        <div>
+          <div class="fitur-top"><span class="no">07</span><span class="fitur-tag">PRIVACY</span></div>
+          <h3 data-i18n="f07t">Locked Until Activated</h3>
+          <p data-i18n="f07d">Osvyn stays fully locked until a valid MuseKey activates it on your machine. Every profile session stays separate, so accounts never mix.</p>
+        </div>
+      </div>
+      <div class="fitur span-2">
+        <div>
+          <div class="fitur-top"><span class="no">08</span><span class="fitur-tag">PLAN UPDATES</span></div>
+          <h3 data-i18n="f08t">Updates in Your Window</h3>
+          <p data-i18n="f08d">New versions are released within your plan update window. You install them when it suits your work, with no surprise restarts.</p>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:28px"><a class="tombol cyan" href="https://wa.me/6281554034879?text=Hi%2C%20I%20want%20to%20buy%20Osvyn.%20Could%20you%20tell%20me%20how%20to%20order%3F" target="_blank" rel="noopener" data-i18n="ctaHead">Get Now</a></div>
+  </div>
+</section>
+
+<!-- Activation Section -->
+<section class="uji" id="aktivasi">
+  <div class="bungkus">
+    <div class="section-head">
+      <div class="kicker" data-i18n="kUji">Activation</div>
+      <h2 data-i18n="uH2">Buy once, activate once, use it forever.</h2>
+      <p class="lead" data-i18n="uLead">There is no free version and no subscription. You buy a plan, receive one activation key, and the app is yours on your machine, for good.</p>
+    </div>
+
+    <div class="langkah">
+      <div class="kotak">
+        <div class="angka">01</div>
+        <h3 data-i18n="s1t">Buy your plan</h3>
+        <p data-i18n="s1d">Choose Founding, Personal, or Bundle Studio. Your MuseKey activation key is sent to your email right after payment.</p>
+      </div>
+      <div class="kotak">
+        <div class="angka">02</div>
+        <h3 data-i18n="s2t">Download and install</h3>
+        <p data-i18n="s2d">Install Osvyn on Windows 10 or 11 (64-bit). The app opens on the activation screen and stays locked until a valid key is entered.</p>
+      </div>
+      <div class="kotak">
+        <div class="angka">03</div>
+        <h3 data-i18n="s3t">Enter your key once</h3>
+        <p data-i18n="s3d">Type your MuseKey on the start screen. The app unlocks to your plan and never asks again on that machine.</p>
+      </div>
+    </div>
+
+    <div class="banding">
+      <div class="panel">
+        <h3 data-i18n="pBuka">Inside the app</h3>
+        <ul>
+          <li data-i18n="o1"><b>A profile for every account</b>, each with its own separate login</li>
+          <li data-i18n="o2"><b>DeepSleep</b> RAM saving and <b>QuickSwitch</b> Ctrl+1&ndash;9</li>
+          <li data-i18n="o3"><b>Aura ID &amp; Presence Dot</b> for each profile identity</li>
+          <li data-i18n="o4"><b>AutoResume</b>, <b>Profile Vault</b> backup and restore, and <b>MuseKey</b> activation lock</li>
+          <li data-i18n="o5"><b>New versions</b> within your plan update window</li>
+        </ul>
+      </div>
+      <div class="panel tidak">
+        <h3 data-i18n="pTutup">Not included</h3>
+        <ul>
+          <li data-i18n="c1"><b>Muse accounts</b> each profile signs in with your own account</li>
+          <li data-i18n="c2"><b>Hub</b> the most complete tier, released separately for the top plan</li>
+          <li data-i18n="c3"><b>Second PC license</b> (Bundle Studio)</li>
+          <li data-i18n="c4"><b>Priority email support</b> (Bundle Studio)</li>
+        </ul>
+      </div>
+    </div>
+    <div style="margin-top:24px"><a class="tombol cyan" href="https://wa.me/6281554034879?text=Hi%2C%20I%20want%20to%20buy%20Osvyn.%20Could%20you%20tell%20me%20how%20to%20order%3F" target="_blank" rel="noopener" data-i18n="ctaHead">Get Now</a></div>
+  </div>
+</section>
+
+<!-- Pricing Section -->
+<section id="harga">
+  <div class="bungkus">
+    <div class="section-head">
+      <div class="kicker" data-i18n="kHarga">Pricing</div>
+      <h2 data-i18n="hH2">One-time payment. No subscription.</h2>
+      <p class="lead" data-i18n="hLead">Global pricing in USD. Muse accounts are not included. Each profile signs in with the buyer's own Muse account.</p>
+    </div>
+
+    <div class="harga-grid">
+      <div class="kartu">
+        <div>
+          <div class="tingkat">FOUNDING</div>
+          <div class="rp" data-i18n="rpF">$19<s>$39</s></div>
+          <div class="ket" data-i18n="ketF">One-time payment &middot; 1 PC &middot; lifetime license</div>
+          <p class="isi-kartu" data-i18n="isiF">Introductory price for the first group of buyers. The feature set stays at the launch version, with bug-fix updates for 6 months.</p>
+        </div>
+        <a href="https://wa.me/6281554034879?text=Hi%2C%20I%20want%20to%20buy%20Osvyn%20Founding%20(%2419).%20How%20do%20I%20pay%3F" target="_blank" rel="noopener" class="tombol putih kartu-cta">Get Now</a>
+      </div>
+
+      <div class="kartu utama">
+        <div class="pop-badge">RECOMMENDED</div>
+        <div>
+          <div class="tingkat">PERSONAL</div>
+          <div class="rp" data-i18n="rpP">$39</div>
+          <div class="ket" data-i18n="ketP">One-time payment &middot; 1 PC &middot; lifetime license</div>
+          <p class="isi-kartu" data-i18n="isiP">The main choice for daily users. All version 1.x feature updates for 12 months, including Aura ID and Presence Dot, Profile Vault backup and restore, and new versions within the update window.</p>
+        </div>
+        <a href="https://wa.me/6281554034879?text=Hi%2C%20I%20want%20to%20buy%20Osvyn%20Personal%20(%2439).%20How%20do%20I%20pay%3F" target="_blank" rel="noopener" class="tombol cyan kartu-cta">Get Now</a>
+      </div>
+
+      <div class="kartu">
+        <div>
+          <div class="tingkat">BUNDLE STUDIO</div>
+          <div class="rp" data-i18n="rpB">$79</div>
+          <div class="ket" data-i18n="ketB">One-time payment &middot; 2 PCs &middot; lifetime license</div>
+          <p class="isi-kartu" data-i18n="isiB">For small teams and creators. Licenses for 2 PCs, a ready-to-use Multi-Agent System Template, a profile setup guide, 24 months of updates, and priority email support.</p>
+        </div>
+        <a href="https://wa.me/6281554034879?text=Hi%2C%20I%20want%20to%20buy%20Osvyn%20Bundle%20Studio%20(%2479).%20How%20do%20I%20pay%3F" target="_blank" rel="noopener" class="tombol putih kartu-cta">Get Now</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ Section -->
+<section id="faq">
+  <div class="bungkus faq-layout">
+    <div>
+      <div class="kicker">FAQ</div>
+      <h2 data-i18n="qH2">Frequently asked questions</h2>
+      <p class="lead" style="margin-top:10px">Everything you need to know about licensing, offline behavior, and system requirements.</p>
+      <div style="margin-top:20px"><a class="tombol cyan" href="https://wa.me/6281554034879?text=Hi%2C%20I%20want%20to%20buy%20Osvyn.%20Could%20you%20tell%20me%20how%20to%20order%3F" target="_blank" rel="noopener" data-i18n="ctaHead">Get Now</a></div>
+    </div>
+    <div class="faq">
+      <details open><summary data-i18n="q1">Are Muse accounts included in the price?</summary><p data-i18n="a1">No. Osvyn is a profile manager app. Each profile signs in with your own Muse account, on the official Muse page.</p></details>
+      <details><summary data-i18n="q2">How do I activate Osvyn?</summary><p data-i18n="a2">Buy a plan and your MuseKey arrives by email. Enter it once on the app start screen and the app unlocks to your plan right away.</p></details>
+      <details><summary data-i18n="q3">Can I use Osvyn offline?</summary><p data-i18n="a3">Yes. After activation the app works offline. It checks in occasionally when a connection is available, and a 7-day offline grace period keeps you working when the internet drops.</p></details>
+      <details><summary data-i18n="q4">What is the Hub?</summary><p data-i18n="a4">The Hub is the most complete Osvyn tier: one space where profiles and agents from all accounts gather and work together, with unlimited profiles. The Hub is a separate plan, ordered through WhatsApp.</p></details>
+      <details><summary data-i18n="q5">Which computers are supported?</summary><p data-i18n="a5">Windows 10 or 11 (64-bit) with the WebView2 Runtime and an internet connection for signing in and using Muse.</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- Developer Invitation Section -->
+<section id="mulai">
+  <div class="bungkus">
+    <div class="pass-box">
+      <div>
+        <div class="kicker" style="color:#34d399">Getting started</div>
+        <h2 data-i18n="refH2">New to Muse?</h2>
+        <p data-i18n="refP" style="margin-top:12px">Osvyn organizes the Muse accounts you already have. If you are just starting out, create your free Muse account first through the developer's invitation, then come back and pick your Osvyn plan.</p>
+        <div style="margin-top:24px">
+          <a class="tombol cyan" id="tombolUndangan" href="https://muse.ai/join" target="_blank" rel="noopener" data-i18n="refBtn" style="padding:12px 22px">Create a free Muse account &rarr;</a>
+        </div>
+        <div style="margin-top:12px">
+          <a class="tombol putih" href="https://wa.me/6281554034879?text=Hi%2C%20I%20want%20to%20buy%20Osvyn.%20Could%20you%20tell%20me%20how%20to%20order%3F" target="_blank" rel="noopener" data-i18n="ctaHead" style="padding:12px 22px">Get Now</a>
+        </div>
+      </div>
+
+      <div class="ticket-card">
+        <div class="ticket-code-row">
+          <div>
+            <div class="ticket-label" data-i18n="refKodeLabel">INVITATION CODE</div>
+            <div id="kodeUndangan">HXS722</div>
+          </div>
+          <button class="tombol putih" id="salinKode" type="button" style="padding:10px 16px;font-family:var(--font-mono);font-size:12.5px" data-i18n="refCopy">Copy code</button>
+        </div>
+        <p data-i18n="refNote" style="font-size:12px;color:#71717a;line-height:1.55">After joining, redeem this code in Muse Settings within 48 hours. Invitation codes come from the developer's own Muse accounts, and any invitation reward follows Muse's own terms.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="bungkus kaki">
+    <p data-i18n="foot2">Global prices are charged in USD. Indonesian prices apply when Bahasa Indonesia is selected.</p>
+    <p class="disclaimer" data-i18n="foot3">Osvyn is an independent product. It is not affiliated with Meta, it is not endorsed by Meta, and it is not an official Meta product.</p>
+  </div>
+</footer>
+
+</div>
+
+<script>
+  // ===== Interactive Mockup Switcher (Anti-Slop Live Demo) =====
+  var MOCK_PROFILES = [
+    { letter: 'W', color: '#2563eb', name: 'Work Profile #01', aura: 'Cobalt Blue', status: '● Active Session', ram: 'RAM 142 MB (1 sleeping)', reply: 'Ready in isolated Work workspace. Context, history, and cookies are 100% separated from your other profiles.' },
+    { letter: 'C', color: '#8b5cf6', name: 'Creator Studio #02', aura: 'Electric Violet', status: '● Active Session', ram: 'RAM 148 MB (1 sleeping)', reply: 'Switched to Creator account in 12ms. Zero reload wait, separate Muse login session active.' },
+    { letter: 'T', color: '#10b981', name: 'Team Shared #03', aura: 'Emerald Green', status: '⚡ Woken from DeepSleep', ram: 'RAM 194 MB (All awake)', reply: 'Profile woken from DeepSleep mode! All previous tabs and prompt state restored automatically.' }
+  ];
+
+  var tabs = document.querySelectorAll('.tab[data-tab]');
+  function activateMockTab(idx) {
+    tabs.forEach(function(t, i) {
+      t.classList.toggle('aktif', i === idx);
+    });
+    var p = MOCK_PROFILES[idx];
+    if (!p) return;
+    document.getElementById('mockAvatar').style.background = p.color;
+    document.getElementById('mockAvatar').textContent = p.letter;
+    document.getElementById('mockProfileName').textContent = p.name;
+    document.getElementById('mockAura').textContent = p.aura;
+    document.getElementById('mockStatus').textContent = p.status;
+    document.getElementById('ramMeter').textContent = p.ram;
+    document.getElementById('mockPromptReply').textContent = p.reply;
+  }
+
+  tabs.forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      activateMockTab(parseInt(tab.getAttribute('data-tab'), 10));
+    });
+  });
+
+  window.addEventListener('keydown', function(e) {
+    if (['INPUT', 'TEXTAREA', 'SELECT'].indexOf(document.activeElement.tagName) !== -1) return;
+    if (e.key === '1') activateMockTab(0);
+    if (e.key === '2') activateMockTab(1);
+    if (e.key === '3') activateMockTab(2);
+  });
+
+  // ===== Satu build, dua pasar: paket bahasa + harga diganti dari satu file =====
+  var DEFAULTS = {};
+  document.querySelectorAll('[data-i18n]').forEach(function(el){ DEFAULTS[el.getAttribute('data-i18n')] = el.innerHTML; });
+  var ID = {
+    jargon: 'Pengelola multi-akun untuk Muse', nFitur: 'Fitur', nUji: 'Aktivasi', nHarga: 'Harga', ctaHead: 'Dapatkan Sekarang',
+    badge: 'Sekali bayar &middot; lisensi permanen',
+    h1: 'Semua akun Muse Anda, <span class="seru">satu jendela.</span>',
+    sub: 'Osvyn menjalankan banyak akun Muse secara bersamaan dalam satu aplikasi Windows. Setiap akun punya sesi login terpisah, dan profil tidak saling mengganggu. Sekali bayar, bukan langganan.',
+    ctaMain: 'Dapatkan Sekarang', ctaHarga: 'Cara Aktivasi',
+    mikro: 'Unduh aplikasinya, aktifkan dengan kunci Anda, lalu langsung bekerja. Aktivasi butuh sekitar satu menit, dan hanya satu kali.',
+    jJudul: 'Osvyn &middot; jendela aplikasi', sisa: 'Lisensi aktif &middot; Personal',
+    t1: 'Akun Kerja', t2: 'Akun Kreator', t3: 'Akun Tim <small>tidur &middot; hemat RAM</small>',
+    balon: 'Setiap profil masuk dengan akun Muse miliknya sendiri. Berpindah akun cukup satu klik, atau tekan Ctrl+1 sampai Ctrl+9.',
+    ketik: 'Tulis pesan untuk Muse&hellip;', kirim: 'Kirim ↵',
+    caption: 'Tampilan konsep aplikasi Osvyn. Profil yang tidak aktif masuk mode DeepSleep dan membebaskan RAM.',
+    kFitur: 'Fitur', fH2: 'Dibangun untuk pemakai banyak akun',
+    fLead: 'Bukan sekadar banyak tab. Osvyn mengelola sesi, memori, dan identitas setiap akun Muse yang Anda pakai setiap hari.',
+    f01t: 'Profil untuk Setiap Akun', f01d: 'Tambah profil sampai batas paket Anda, hingga tanpa batas di paket Hub. Setiap profil adalah sesi login Muse yang terpisah dan persisten.',
+    f02t: 'DeepSleep Hemat RAM', f02d: 'Profil yang tidak aktif selama 3 menit masuk mode tidur dan membebaskan RAM. Satu klik membangunkannya kembali.',
+    f03t: 'QuickSwitch', f03d: 'Berpindah profil secepat berpindah pikiran Ctrl+1 sampai Ctrl+9, tanpa mouse, tanpa menunggu muat ulang.',
+    f04t: 'Aura ID &amp; Presence Dot', f04d: 'Setiap profil punya warna identitas dan titik kehadiran, jadi Anda selalu tahu akun mana yang aktif, tidur, atau terbuka.',
+    f05t: 'AutoResume', f05d: 'Aplikasi mengingat profil terakhir dan susunan tab Anda. Buka kembali, semua persis seperti saat ditinggalkan.',
+    f06t: 'Profile Vault', f06d: 'Cadangkan dan pulihkan daftar profil Anda. Pindah komputer tidak berarti menyusun ulang semuanya dari nol.',
+    f07t: 'Terkunci Sampai Aktivasi', f07d: 'Osvyn terkunci penuh sampai MuseKey yang valid mengaktifkannya di mesin Anda. Setiap sesi profil tetap terpisah, jadi akun tidak pernah tercampur.',
+    f08t: 'Pembaruan Sesuai Jendela Paket', f08d: 'Versi baru dirilis selama jendela pembaruan paket Anda. Anda memasangnya saat waktu kerja Anda pas, tanpa restart mendadak.',
+    kUji: 'Aktivasi', uH2: 'Beli sekali, aktifkan sekali, pakai selamanya.',
+    uLead: 'Tidak ada versi gratis dan tidak ada langganan. Anda membeli satu paket, menerima satu kunci aktivasi, dan aplikasinya menjadi milik Anda di mesin Anda, selamanya.',
+    s1t: 'Beli paket Anda', s1d: 'Pilih Founding, Personal, atau Bundle Studio. Kunci aktivasi MuseKey dikirim ke email Anda segera sesudah pembayaran.',
+    s2t: 'Unduh dan pasang', s2d: 'Pasang Osvyn di Windows 10 atau 11 (64-bit). Aplikasi membuka layar aktivasi dan tetap terkunci sampai kunci yang sah dimasukkan.',
+    s3t: 'Masukkan kunci satu kali', s3d: 'Ketik MuseKey Anda di layar awal. Aplikasi terbuka sesuai paket Anda dan tidak akan memintanya lagi di mesin itu.',
+    pBuka: 'Di dalam aplikasinya',
+    o1: '<b>Satu profil untuk setiap akun</b>, masing-masing dengan login terpisah',
+    o2: '<b>DeepSleep</b> hemat RAM dan <b>QuickSwitch</b> Ctrl+1&ndash;9',
+    o3: '<b>Aura ID &amp; Presence Dot</b> untuk identitas tiap profil',
+    o4: '<b>AutoResume</b>, <b>Profile Vault</b> untuk backup dan restore, dan kunci aktivasi <b>MuseKey</b>',
+    o5: '<b>Versi baru</b> selama jendela pembaruan paket Anda',
+    pTutup: 'Tidak termasuk',
+    c1: '<b>Akun Muse</b> setiap profil masuk dengan akun milik Anda sendiri',
+    c2: '<b>Hub</b> tingkat terlengkap, dirilis terpisah untuk paket tertinggi',
+    c3: '<b>Lisensi PC kedua</b> (Bundle Studio)',
+    c4: '<b>Dukungan email prioritas</b> (Bundle Studio)',
+    kHarga: 'Harga', hH2: 'Sekali bayar. Tanpa langganan.',
+    hLead: 'Harga untuk Indonesia. Akun Muse tidak termasuk. Setiap profil masuk dengan akun milik pembeli sendiri.',
+    rpF: 'Rp199.000<s>Rp319.000</s>', ketF: 'Sekali bayar &middot; 1 PC &middot; lisensi permanen',
+    isiF: 'Harga perkenalan untuk pembeli angkatan pertama. Fitur tetap pada versi peluncuran, dengan pembaruan perbaikan selama 6 bulan.',
+    rpP: 'Rp319.000', ketP: 'Sekali bayar &middot; 1 PC &middot; lisensi permanen',
+    isiP: 'Pilihan utama untuk pengguna harian. Semua pembaruan fitur versi 1.x selama 12 bulan, termasuk Aura ID dan Presence Dot, Profile Vault untuk backup dan restore, dan versi baru selama jendela pembaruan.',
+    rpB: 'Rp639.000', ketB: 'Sekali bayar &middot; 2 PC &middot; lisensi permanen',
+    isiB: 'Untuk tim kecil dan kreator. Lisensi 2 PC, Template Sistem Multi-Agent siap pakai, panduan penataan profil, pembaruan 24 bulan, dan dukungan email prioritas.',
+    qH2: 'Yang sering ditanyakan',
+    q1: 'Apakah akun Muse termasuk dalam harga?', a1: 'Tidak. Osvyn adalah aplikasi pengelola profil. Setiap profil masuk dengan akun Muse milik Anda sendiri, di halaman resmi Muse.',
+    q2: 'Bagaimana cara mengaktifkan Osvyn?', a2: 'Beli paketnya dan MuseKey Anda tiba lewat email. Masukkan satu kali di layar awal aplikasi, dan aplikasi langsung terbuka sesuai paket Anda.',
+    q3: 'Bisakah Osvyn dipakai offline?', a3: 'Bisa. Sesudah aktivasi, aplikasi bekerja offline. Aplikasi memeriksa status sesekali saat ada sambungan, dan masa tenggang offline 7 hari menjaga Anda tetap bisa bekerja saat internet putus.',
+    q4: 'Apa itu Hub?', a4: 'Hub adalah tingkat terlengkap Osvyn: satu ruang tempat profil dan agen dari semua akun berkumpul dan bekerja bersama, dengan profil tanpa batas. Hub adalah paket terpisah, dipesan melalui WhatsApp.',
+    q5: 'Komputer apa yang didukung?', a5: 'Windows 10 atau 11 (64-bit) dengan WebView2 Runtime dan koneksi internet untuk masuk dan memakai Muse.',
+    refH2: 'Belum punya Muse?',
+    refP: 'Osvyn mengelola akun Muse yang sudah Anda miliki. Kalau baru mulai, buat dulu akun Muse gratis Anda lewat undangan pengembang, lalu kembali dan pilih paket Osvyn Anda.',
+    refBtn: 'Buat akun Muse gratis &rarr;',
+    refKodeLabel: 'KODE UNDANGAN',
+    refCopy: 'Salin kode',
+    refNote: 'Sesudah bergabung, tukarkan kode ini di Pengaturan Muse dalam waktu 48 jam. Kode undangan berasal dari akun Muse milik pengembang sendiri, dan imbalan undangan apa pun mengikuti ketentuan Muse.',
+    foot2: 'Harga global dibayar dalam USD. Harga Indonesia berlaku saat Bahasa Indonesia dipilih.',
+    foot3: 'Osvyn adalah produk independen. Tidak berafiliasi dengan Meta, tidak didukung oleh Meta, dan bukan produk resmi Meta.'
+  };
+  var sel = document.getElementById('bahasa');
+  function setLang(l){
+    document.querySelectorAll('[data-i18n]').forEach(function(el){
+      var k = el.getAttribute('data-i18n');
+      el.innerHTML = (l === 'id' && ID[k]) ? ID[k] : DEFAULTS[k];
+    });
+    document.documentElement.lang = l;
+    sel.value = l;
+  }
+  sel.addEventListener('change', function(){ setLang(sel.value); });
+  var awal = new URLSearchParams(location.search).get('lang');
+  setLang(awal === 'id' ? 'id' : 'en');
+</script>
+<script>
+  // ===== Undangan Muse: 3 kode dari 3 akun pengembang, diputar rata =====
+  var UNDANGAN = [
+    { link: 'https://muse.ai/join', kode: 'HXS722' },
+    { link: 'https://muse.ai/join', kode: 'RMIMMI' },
+    { link: 'https://muse.ai/join', kode: 'EX58TQ' }
+  ];
+  (function () {
+    var tombol = document.getElementById('tombolUndangan');
+    var elKode = document.getElementById('kodeUndangan');
+    var idx = Math.floor(Date.now() / 60000) % UNDANGAN.length;
+    var aktif = UNDANGAN[idx];
+    if (tombol) tombol.href = aktif.link;
+    if (elKode) elKode.textContent = aktif.kode;
+    var salin = document.getElementById('salinKode');
+    if (salin) {
+      salin.addEventListener('click', function () {
+        function selesai() {
+          salin.textContent = document.documentElement.lang === 'id' ? '✓ Tersalin' : '✓ Copied';
+          setTimeout(function () {
+            salin.textContent = document.documentElement.lang === 'id' ? 'Salin kode' : 'Copy code';
+          }, 1600);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(aktif.kode).then(selesai, selesai);
+        } else {
+          var ta = document.createElement('textarea');
+          ta.value = aktif.kode;
+          document.body.appendChild(ta);
+          ta.select();
+          try { document.execCommand('copy'); } catch (e) {}
+          document.body.removeChild(ta);
+          selesai();
+        }
+      });
+    }
+  })();
+</script>
+</body>
+</html>

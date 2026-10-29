@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-tambah-profil"
+description = "Enables the tambah_profil command without any pre-configured scope."
+commands.allow = ["tambah_profil"]
+
+[[permission]]
+identifier = "deny-tambah-profil"
+description = "Denies the tambah_profil command without any pre-configured scope."
+commands.deny = ["tambah_profil"]

@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-info-paket"
+description = "Enables the info_paket command without any pre-configured scope."
+commands.allow = ["info_paket"]
+
+[[permission]]
+identifier = "deny-info-paket"
+description = "Denies the info_paket command without any pre-configured scope."
+commands.deny = ["info_paket"]

@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Osvyn</title>
+<style>
+  html, body { margin:0; padding:0; height:100%; background:#101014; overflow:hidden; }
+  body { font-family:"Segoe UI", system-ui, sans-serif; -webkit-user-select:none; user-select:none; }
+  #bar { position:relative; display:flex; align-items:center; gap:8px; height:100%; padding:0 12px;
+         overflow-x:auto; overflow-y:hidden; scrollbar-width:none; }
+  #bar::-webkit-scrollbar { display:none; }
+  .tab { display:flex; align-items:center; gap:8px; padding:7px 18px; border-radius:999px;
+         background:#1b1b21; color:#b9b6c4; font-size:13.5px; font-weight:600; letter-spacing:.4px;
+         cursor:pointer; border:1px solid #26262e; transition:all .15s; flex:none; white-space:nowrap; }
+  .tab:hover { background:#23232b; color:#e8e6df; }
+  .tab:active { transform:scale(.96); }
+  .tab.aktif { background:#e8e6df; color:#141419; border-color:#e8e6df; }
+  .tab.sibuk { opacity:.45; pointer-events:none; }
+  .dot { width:8px; height:8px; border-radius:50%; background:#15b3da; flex:none; }
+  .dot.tidur { background:#8a8798; }
+  .x { font-size:14px; line-height:1; margin-left:2px; padding:6px 9px; border-radius:50%;
+       opacity:.45; transition:opacity .15s, transform .12s ease, background-color .18s ease; cursor:pointer; }
+  .x:active { transform:scale(.82); }
+  .tab:hover .x { opacity:.8; }
+  .x:hover { opacity:1 !important; background:rgba(220,60,60,.25); color:#ff7b7b; }
+  .tab.aktif .x:hover { background:rgba(220,60,60,.2); color:#c0392b; }
+  .plus { padding:7px 14px; font-size:16px; line-height:1; font-weight:700; }
+  .plus.sibuk { opacity:.45; pointer-events:none; animation:denyut .8s ease-in-out infinite; }
+  @keyframes denyut { 0%,100% { transform:scale(1); } 50% { transform:scale(1.22); } }
+  #bar:has(#kotak-baru.tampil) #tambah { transform:rotate(45deg); background:#23232b; color:#e8e6df; }
+  .kotak.tampil { animation:geserMasuk .22s ease; }
+  @keyframes geserMasuk { from { opacity:0; transform:translateX(-6px); } to { opacity:1; transform:translateX(0); } }
+  #status { pointer-events:none; }
+  #status.menyala { position:absolute; left:50%; top:50%; z-index:5; pointer-events:auto;
+                    transform:translate(-50%,-50%); background:#17171d; color:#f2f1ec;
+                    border:1px solid #2e2e37; border-left:3px solid #15b3da; border-radius:999px;
+                    padding:6px 16px; font-weight:600; font-size:12.5px; cursor:pointer;
+                    box-shadow:0 6px 24px rgba(0,0,0,.45); animation:toastMasuk .25s ease; }
+  #status.menyala:hover { border-color:#15b3da; }
+  @keyframes toastMasuk { from { opacity:0; transform:translate(-50%,-46%); } to { opacity:1; transform:translate(-50%,-50%); } }
+  .kotak { display:none; align-items:center; gap:8px; flex:none; }
+  .kotak.tampil { display:flex; }
+  .kotak input { background:#1b1b21; border:1px solid #3a3a46; border-radius:999px; color:#e8e6df;
+               font-size:13.5px; font-weight:600; padding:7px 14px; outline:none; width:150px;
+               font-family:inherit; }
+  .kotak input:focus { border-color:#e8e6df; }
+  .btn { padding:7px 16px; border-radius:999px; font-size:13px; font-weight:700; cursor:pointer;
+         border:1px solid #3a3a46; background:#23232b; color:#e8e6df; flex:none;
+         transition:transform .12s ease, background-color .18s ease, color .18s ease, border-color .18s ease, opacity .18s ease; }
+  .btn:hover { background:#2c2c36; }
+  .btn:active { transform:scale(.93); }
+  .btn.bahaya { background:#5a1f1f; border-color:#7a2d2d; color:#ffb3b3; }
+  .btn.bahaya:hover { background:#6d2626; }
+  .petunjuk { font-size:11.5px; color:#5d5a75; white-space:nowrap; }
+  #status { color:#b9b6c4; font-size:12.5px; white-space:nowrap; }
+  .tab input.ren { background:transparent; border:none; outline:none; color:inherit;
+                   font:inherit; width:110px; padding:0; }
+  #bahasa { margin-left:auto; flex:none; background:#1b1b21; color:#b9b6c4; border:1px solid #26262e;
+            border-radius:999px; padding:5px 8px; font-size:12.5px; outline:none; cursor:pointer;
+            font-family:inherit; transition:transform .12s ease, background-color .18s ease, color .18s ease, border-color .18s ease; }
+  #bahasa:active { transform:scale(.97); }
+  .tab.terkunci { opacity:.45; }
+  #paket { color:#8a8798; font-size:12px; white-space:nowrap; flex:none; letter-spacing:.3px; }
+</style>
+</head>
+<body>
+  <div id="bar">
+    <div id="daftar" style="display:flex; align-items:center; gap:8px;"></div>
+    <div class="tab plus" id="tambah" title="Add profile">+</div>
+    <div class="kotak" id="kotak-baru">
+      <input id="nama-baru" placeholder="New profile name" maxlength="30">
+      <div class="btn" id="btn-buat">Create</div>
+      <span class="petunjuk" id="petunjuk-baru">Enter = create &middot; Esc = cancel</span>
+    </div>
+    <div class="kotak" id="kotak-hapus">
+      <span class="petunjuk" id="teks-hapus" style="color:#ffb3b3; font-size:12.5px;"></span>
+      <div class="btn bahaya" id="btn-hapus">Delete</div>
+      <div class="btn" id="btn-batal-hapus">Cancel</div>
+    </div>
+    <span id="status"></span>
+    <div class="tab" id="tombol-hub" title="Hub">Hub</div>
+    <div class="tab" id="tombol-tidur-semua" title="Sleep all profiles" style="display:none">Sleep all</div>
+    <span id="paket"></span>
+    <select id="bahasa" aria-label="Language">
+      <option value="en">English</option>
+      <option value="id">Bahasa Indonesia</option>
+      <option value="es">Español</option>
+      <option value="pt">Português</option>
+      <option value="fr">Français</option>
+      <option value="de">Deutsch</option>
+      <option value="it">Italiano</option>
+      <option value="ru">Русский</option>
+      <option value="ar">العربية</option>
+      <option value="tr">Türkçe</option>
+      <option value="hi">हिन्दी</option>
+      <option value="zh">中文</option>
+      <option value="ja">日本語</option>
+      <option value="ko">한국어</option>
+    </select>
+  </div>
+<script>
+  var KATA = {
+    en: { add:"Add profile", ph:"New profile name", create:"Create", hint:"Enter = create · Esc = cancel",
+      delTitle:"Delete profile", last:"The last profile cannot be deleted.",
+      confirm:"Delete \"{name}\"? Its sign-in data will be removed too.", del:"Delete", cancel:"Cancel",
+      creating:"Preparing new profile…", deleting:"Deleting…",
+      sleeping:"Sleeping (DeepSleep) - click to wake", failDel:"Failed to delete profile: ", failAdd:"Failed to add profile: ",
+      hubLock:"The Hub is available on the Hub plan.", sleepAll:"Sleep all", sleepingAll:"Putting all profiles to sleep…", dlOpen:"Click to show the file in Windows Explorer" },
+    id: { add:"Tambah profil", ph:"Nama profil baru", create:"Buat", hint:"Enter = buat · Esc = batal",
+      delTitle:"Hapus profil", last:"Profil terakhir tidak bisa dihapus.",
+      confirm:"Hapus \"{name}\"? Data login di dalamnya ikut terhapus.", del:"Hapus", cancel:"Batal",
+      creating:"Menyiapkan profil baru…", deleting:"Menghapus…",
+      sleeping:"Tidur (DeepSleep) - klik untuk membangunkan", failDel:"Gagal hapus profil: ", failAdd:"Gagal tambah profil: ",
+      hubLock:"Hub tersedia di paket Hub.", sleepAll:"Tidurkan semua", sleepingAll:"Menidurkan semua profil…", dlOpen:"Klik untuk tampilkan berkasnya di Windows Explorer" },
+    es: { add:"Añadir perfil", ph:"Nombre del perfil nuevo", create:"Crear", hint:"Enter = crear · Esc = cancelar",
+      delTitle:"Eliminar perfil", last:"El último perfil no se puede eliminar.",
+      confirm:"¿Eliminar \"{name}\"? Sus datos de inicio de sesión también se borrarán.", del:"Eliminar", cancel:"Cancelar",
+      creating:"Preparando el perfil nuevo…", deleting:"Eliminando…",
+      sleeping:"En reposo (DeepSleep) - clic para activar", failDel:"No se pudo eliminar el perfil: ", failAdd:"No se pudo añadir el perfil: ", hubLock:"El Hub está disponible en el plan Hub.", sleepAll:"Dormir todo", sleepingAll:"Poniendo en reposo todos los perfiles…" },
+    pt: { add:"Adicionar perfil", ph:"Nome do novo perfil", create:"Criar", hint:"Enter = criar · Esc = cancelar",
+      delTitle:"Excluir perfil", last:"O último perfil não pode ser excluído.",
+      confirm:"Excluir \"{name}\"? Os dados de login dele também serão removidos.", del:"Excluir", cancel:"Cancelar",
+      creating:"Preparando o novo perfil…", deleting:"Excluindo…",
+      sleeping:"Dormindo (DeepSleep) - clique para acordar", failDel:"Falha ao excluir o perfil: ", failAdd:"Falha ao adicionar o perfil: ", hubLock:"O Hub está disponível no plano Hub.", sleepAll:"Repousar tudo", sleepingAll:"Colocando todos os perfis em repouso…" },
+    fr: { add:"Ajouter un profil", ph:"Nom du nouveau profil", create:"Créer", hint:"Entrée = créer · Échap = annuler",
+      delTitle:"Supprimer le profil", last:"Le dernier profil ne peut pas être supprimé.",
+      confirm:"Supprimer « {name} » ? Ses données de connexion seront aussi effacées.", del:"Supprimer", cancel:"Annuler",
+      creating:"Préparation du nouveau profil…", deleting:"Suppression…",
+      sleeping:"En veille (DeepSleep) - cliquez pour réveiller", failDel:"Échec de la suppression du profil : ", failAdd:"Échec de l'ajout du profil : ", hubLock:"Le Hub est disponible dans le forfait Hub.", sleepAll:"Tout mettre en veille", sleepingAll:"Mise en veille de tous les profils…" },
+    de: { add:"Profil hinzufügen", ph:"Name des neuen Profils", create:"Erstellen", hint:"Enter = erstellen · Esc = abbrechen",
+      delTitle:"Profil löschen", last:"Das letzte Profil kann nicht gelöscht werden.",
+      confirm:"\"{name}\" löschen? Die Anmeldedaten darin werden mit entfernt.", del:"Löschen", cancel:"Abbrechen",
+      creating:"Neues Profil wird vorbereitet…", deleting:"Wird gelöscht…",
+      sleeping:"Schläft (DeepSleep) - klicken zum Aufwecken", failDel:"Profil konnte nicht gelöscht werden: ", failAdd:"Profil konnte nicht hinzugefügt werden: ", hubLock:"Der Hub ist im Hub-Tarif verfügbar.", sleepAll:"Alle schlafen legen", sleepingAll:"Alle Profile werden schlafen gelegt…" },
+    it: { add:"Aggiungi profilo", ph:"Nome del nuovo profilo", create:"Crea", hint:"Invio = crea · Esc = annulla",
+      delTitle:"Elimina profilo", last:"L'ultimo profilo non può essere eliminato.",
+      confirm:"Eliminare \"{name}\"? Anche i suoi dati di accesso verranno rimossi.", del:"Elimina", cancel:"Annulla",
+      creating:"Preparazione del nuovo profilo…", deleting:"Eliminazione…",
+      sleeping:"In pausa (DeepSleep) - clicca per riattivare", failDel:"Impossibile eliminare il profilo: ", failAdd:"Impossibile aggiungere il profilo: ", hubLock:"L'Hub è disponibile nel piano Hub.", sleepAll:"Metti tutto in pausa", sleepingAll:"Messa in pausa di tutti i profili…" },
+    ru: { add:"Добавить профиль", ph:"Имя нового профиля", create:"Создать", hint:"Enter = создать · Esc = отмена",
+      delTitle:"Удалить профиль", last:"Последний профиль удалить нельзя.",
+      confirm:"Удалить «{name}»? Данные входа в нём тоже будут удалены.", del:"Удалить", cancel:"Отмена",
+      creating:"Подготовка нового профиля…", deleting:"Удаление…",
+      sleeping:"Спит (DeepSleep) - нажмите, чтобы разбудить", failDel:"Не удалось удалить профиль: ", failAdd:"Не удалось добавить профиль: ", hubLock:"Hub доступен в тарифе Hub.", sleepAll:"Усыпить все", sleepingAll:"Перевод всех профилей в сон…" },
+    ar: { add:"إضافة ملف", ph:"اسم الملف الجديد", create:"إنشاء", hint:"Enter = إنشاء · Esc = إلغاء",
+      delTitle:"حذف الملف", last:"لا يمكن حذف الملف الأخير.",
+      confirm:"حذف \"{name}\"؟ ستتم إزالة بيانات تسجيل الدخول فيه أيضًا.", del:"حذف", cancel:"إلغاء",
+      creating:"جارٍ تجهيز الملف الجديد…", deleting:"جارٍ الحذف…",
+      sleeping:"نائم (DeepSleep) - انقر للإيقاظ", failDel:"فشل حذف الملف: ", failAdd:"فشل إضافة الملف: ", hubLock:"ميزة Hub متاحة في خطة Hub.", sleepAll:"تنويم الكل", sleepingAll:"جارٍ تنويم جميع الملفات…" },
+    tr: { add:"Profil ekle", ph:"Yeni profil adı", create:"Oluştur", hint:"Enter = oluştur · Esc = iptal",
+      delTitle:"Profili sil", last:"Son profil silinemez.",
+      confirm:"\"{name}\" silinsin mi? İçindeki oturum verileri de kaldırılır.", del:"Sil", cancel:"İptal",
+      creating:"Yeni profil hazırlanıyor…", deleting:"Siliniyor…",
+      sleeping:"Uyuyor (DeepSleep) - uyandırmak için tıklayın", failDel:"Profil silinemedi: ", failAdd:"Profil eklenemedi: ", hubLock:"Hub, Hub planında kullanılabilir.", sleepAll:"Tümünü uyut", sleepingAll:"Tüm profiller uyutuluyor…" },
+    hi: { add:"प्रोफ़ाइल जोड़ें", ph:"नई प्रोफ़ाइल का नाम", create:"बनाएँ", hint:"Enter = बनाएँ · Esc = रद्द करें",
+      delTitle:"प्रोफ़ाइल हटाएँ", delTitle:"प्रोफ़ाइल हटाएँ", last:"आखिरी प्रोफ़ाइल नहीं हटाई जा सकती।",
+      confirm:"\"{name}\" हटाएँ? उसमें मौजूद साइन-इन डेटा भी हट जाएगा।", del:"हटाएँ", cancel:"रद्द करें",
+      creating:"नई प्रोफ़ाइल तैयार हो रही है…", deleting:"हटाया जा रहा है…",
+      sleeping:"सो रही है (DeepSleep) - जगाने के लिए क्लिक करें", failDel:"प्रोफ़ाइल हटाने में विफल: ", failAdd:"प्रोफ़ाइल जोड़ने में विफल: ", hubLock:"Hub, Hub प्लान में उपलब्ध है।", sleepAll:"सभी को सुलाएँ", sleepingAll:"सभी प्रोफ़ाइलों को सुलाया जा रहा है…" },
+    zh: { add:"添加档案", ph:"新档案名称", create:"创建", hint:"Enter = 创建 · Esc = 取消",
+      delTitle:"删除档案", delTitle:"删除档案", last:"最后一个档案无法删除。",
+      confirm:"删除\"{name}\"？其中的登录数据也会一并移除。", del:"删除", cancel:"取消",
+      creating:"正在准备新档案…", deleting:"正在删除…",
+      sleeping:"休眠中 (DeepSleep) - 点击唤醒", failDel:"删除档案失败：", failAdd:"添加档案失败：", hubLock:"Hub 在 Hub 套餐中可用。", sleepAll:"全部休眠", sleepingAll:"正在让所有档案休眠…" },
+    ja: { add:"プロフィールを追加", ph:"新しいプロフィール名", create:"作成", hint:"Enter = 作成 · Esc = キャンセル",
+      delTitle:"プロフィールを削除", delTitle:"プロフィールを削除", last:"最後のプロフィールは削除できません。",
+      confirm:"「{name}」を削除しますか？中のログイン情報も削除されます。", del:"削除", cancel:"キャンセル",
+      creating:"新しいプロフィールを準備中…", deleting:"削除中…",
+      sleeping:"スリープ中 (DeepSleep) - クリックで復帰", failDel:"プロフィールの削除に失敗しました：", failAdd:"プロフィールの追加に失敗しました：", hubLock:"HubはHubプランで利用できます。", sleepAll:"すべてスリープ", sleepingAll:"すべてのプロフィールをスリープ中…" },
+    ko: { add:"프로필 추가", ph:"새 프로필 이름", create:"만들기", hint:"Enter = 만들기 · Esc = 취소",
+      delTitle:"프로필 삭제", delTitle:"프로필 삭제", last:"마지막 프로필은 삭제할 수 없습니다.",
+      confirm:"\"{name}\"을(를) 삭제할까요? 안의 로그인 데이터도 함께 지워집니다.", del:"삭제", cancel:"취소",
+      creating:"새 프로필 준비 중…", deleting:"삭제 중…",
+      sleeping:"절전 중 (DeepSleep) - 클릭하면 깨어납니다", failDel:"프로필 삭제 실패: ", failAdd:"프로필 추가 실패: ", hubLock:"Hub는 Hub 요금제에서 사용할 수 있습니다.", sleepAll:"모두 절전", sleepingAll:"모든 프로필을 절전 중…" }
+  };
+  var bahasa = 'en';
+  var T = KATA.en;
+  var invoke = window.__TAURI__.core.invoke;
+  var daftar = [];
+  var aktif = null;
+  var calonHapus = null;
+  var statusEl = document.getElementById('status');
+  var timerToast = null;
+  window.__toastUnduhan = function(teks) {
+    statusEl.textContent = teks;
+    statusEl.classList.add('menyala');
+    statusEl.dataset.unduhan = '1';
+    statusEl.title = T.dlOpen || '';
+    if (timerToast) clearTimeout(timerToast);
+    timerToast = setTimeout(function(){
+      statusEl.textContent = '';
+      statusEl.classList.remove('menyala');
+      delete statusEl.dataset.unduhan;
+      statusEl.title = '';
+    }, 4500);
+  };
+  statusEl.addEventListener('click', function(){
+    if (statusEl.dataset.unduhan && statusEl.classList.contains('menyala')) {
+      invoke('buka_lokasi_unduhan');
+    }
+  });
+
+  function terapkanBahasa(kode) {
+    if (!KATA[kode]) kode = 'en';
+    bahasa = kode; T = KATA[kode];
+    // Kata baru v0.1.4 (Hub/gerbang) belum diterjemahkan ke semua
+    // bahasa; yang belum ada memakai Inggris.
+    ['hubLock','sleepAll','sleepingAll','dlOpen'].forEach(function(k){
+      if (!T[k]) T[k] = KATA.en[k];
+    });
+    document.documentElement.lang = kode;
+    document.getElementById('tambah').title = T.add;
+    document.getElementById('tombol-tidur-semua').textContent = T.sleepAll;
+    document.getElementById('tombol-tidur-semua').title = T.sleepAll;
+    document.getElementById('nama-baru').placeholder = T.ph;
+    document.getElementById('btn-buat').textContent = T.create;
+    document.getElementById('petunjuk-baru').textContent = T.hint;
+    document.getElementById('btn-hapus').textContent = T.del;
+    document.getElementById('btn-batal-hapus').textContent = T.cancel;
+    document.getElementById('bahasa').value = kode;
+    render();
+  }
+  document.getElementById('bahasa').addEventListener('change', function(){
+    terapkanBahasa(this.value);
+    invoke('simpan_bahasa', { kode: this.value }).catch(function(){});
+  });
+
+  function buatTab(p) {
+    var el = document.createElement('div');
+    el.className = 'tab';
+    el.id = 'tab-' + p.id;
+    var dot = document.createElement('span'); dot.className = 'dot';
+    var label = document.createElement('span'); label.className = 'lbl'; label.textContent = p.nama;
+    var x = document.createElement('span'); x.className = 'x'; x.textContent = '\u00d7';
+    x.title = T.delTitle;
+    x.addEventListener('click', function(e){
+      e.stopPropagation();
+      mintaHapus(el._p);
+    });
+    el.appendChild(dot); el.appendChild(label); el.appendChild(x);
+    el.addEventListener('click', function(){
+      // Deteksi klik-dua manual berbasis id profil (state klikTerakhir),
+      // bukan identitas node — node tab kini dipakai ulang antar-render,
+      // jadi handler membaca profil mutakhir dari el._p.
+      var p = el._p;
+      var kini = Date.now();
+      if (klikTerakhir.id === p.id && kini - klikTerakhir.t < 450) {
+        klikTerakhir = { id: null, t: 0 };
+        rename(el, p);
+      } else {
+        klikTerakhir = { id: p.id, t: kini };
+        pilih(p.id);
+      }
+    });
+    el.addEventListener('dblclick', function(){ rename(el, el._p); });
+    return el;
+  }
+
+  // Render memakai ulang node tab yang sudah ada (kelas .aktif dan
+  // label diperbarui di tempat) supaya transisi CSS tab benar-benar
+  // berjalan; versi lama membangun ulang semua node tiap render
+  // (innerHTML='') sehingga tidak ada animasi tab yang bisa hidup.
+  function render() {
+    var wadah = document.getElementById('daftar');
+    var terlihat = {};
+    daftar.forEach(function(p) {
+      terlihat[p.id] = true;
+      var el = document.getElementById('tab-' + p.id);
+      if (el && !el.querySelector('.lbl')) { el.remove(); el = null; }
+      if (!el) {
+        el = buatTab(p);
+      } else {
+        el.querySelector('.lbl').textContent = p.nama;
+        // Judul tombol x ikut bahasa aktif; tanpa ini judulnya
+        // membeku di bahasa saat tab dibuat (regresi render hemat
+        // node v0.2.5, ketahuan skenario langbar 29 Okt).
+        var xEl = el.querySelector('.x');
+        if (xEl) xEl.title = T.delTitle || '';
+      }
+      el._p = p;
+      el.className = 'tab' + (p.id === aktif ? ' aktif' : '');
+      wadah.appendChild(el);
+    });
+    Array.prototype.slice.call(wadah.children).forEach(function(el) {
+      if (!terlihat[el.id.replace('tab-', '')]) el.remove();
+    });
+  }
+
+  var klikTerakhir = { id: null, t: 0 };
+
+  function pilih(id) {
+    if (id === aktif) return;
+    aktif = id;
+    render();
+    invoke('ganti_profil', { profil: id });
+  }
+
+  function rename(el, p) {
+    var input = document.createElement('input');
+    input.className = 'ren'; input.value = p.nama; input.maxLength = 30;
+    el.innerHTML = ''; el.appendChild(input);
+    input.focus(); input.select();
+    var selesai = false;
+    function tutup(simpan) {
+      if (selesai) return; selesai = true;
+      var baru = input.value.trim();
+      if (simpan && baru && baru !== p.nama) {
+        invoke('ganti_nama', { id: p.id, nama: baru }).then(function(){
+          p.nama = baru; render();
+        }).catch(function(){ render(); });
+      } else { render(); }
+    }
+    input.addEventListener('keydown', function(e){
+      if (e.key === 'Enter') tutup(true);
+      if (e.key === 'Escape') tutup(false);
+      e.stopPropagation();
+    });
+    input.addEventListener('blur', function(){ tutup(true); });
+    input.addEventListener('click', function(e){ e.stopPropagation(); });
+    input.addEventListener('dblclick', function(e){ e.stopPropagation(); });
+  }
+
+  function mintaHapus(p) {
+    if (daftar.length <= 1) {
+      document.getElementById('teks-hapus').textContent = T.last;
+      calonHapus = null;
+    } else {
+      document.getElementById('teks-hapus').textContent =
+        T.confirm.replace('{name}', p.nama);
+      calonHapus = p;
+    }
+    document.getElementById('kotak-baru').classList.remove('tampil');
+    document.getElementById('kotak-hapus').classList.add('tampil');
+  }
+
+  document.getElementById('btn-batal-hapus').addEventListener('click', function(){
+    calonHapus = null;
+    document.getElementById('kotak-hapus').classList.remove('tampil');
+  });
+
+  document.getElementById('btn-hapus').addEventListener('click', function(){
+    if (!calonHapus) {
+      document.getElementById('kotak-hapus').classList.remove('tampil');
+      return;
+    }
+    var target = calonHapus;
+    calonHapus = null;
+    document.getElementById('kotak-hapus').classList.remove('tampil');
+    // Respons seketika (perbaikan 28 Okt): tab hilang dari bar saat itu
+    // juga dan status tampil; penghapusan data berjalan di latar Rust.
+    var cadangan = daftar.slice();
+    var aktifLama = aktif;
+    daftar = daftar.filter(function(p){ return p.id !== target.id; });
+    if (aktif === target.id) aktif = daftar.length ? daftar[0].id : null;
+    render();
+    statusEl.textContent = T.deleting;
+    invoke('hapus_profil', { id: target.id }).then(function(){
+      statusEl.textContent = '';
+    }).catch(function(err){
+      daftar = cadangan; aktif = aktifLama; render();
+      statusEl.textContent = '';
+      alert(T.failDel + err);
+    });
+  });
+
+  document.getElementById('tambah').addEventListener('click', function(){
+    document.getElementById('kotak-hapus').classList.remove('tampil');
+    var kotak = document.getElementById('kotak-baru');
+    kotak.classList.add('tampil');
+    var input = document.getElementById('nama-baru');
+    input.value = '';
+    input.focus();
+  });
+
+  var sedangBuat = false;
+  function buatProfil() {
+    if (sedangBuat) return;
+    sedangBuat = true;
+    var input = document.getElementById('nama-baru');
+    var nama = input.value.trim();
+    document.getElementById('kotak-baru').classList.remove('tampil');
+    document.getElementById('tambah').classList.add('sibuk');
+    statusEl.textContent = T.creating;
+    invoke('tambah_profil', { nama: nama }).then(function(cfg){
+      daftar.push(cfg);
+      aktif = cfg.id;
+      render();
+    }).catch(function(err){
+      sedangBuat = false;
+      document.getElementById('tambah').classList.remove('sibuk');
+      statusEl.textContent = '';
+      alert(T.failAdd + err);
+    });
+  }
+
+  document.getElementById('btn-buat').addEventListener('click', buatProfil);
+
+  var inputBaru = document.getElementById('nama-baru');
+  inputBaru.addEventListener('keydown', function(e){
+    if (e.key === 'Enter') buatProfil();
+    if (e.key === 'Escape') {
+      document.getElementById('kotak-baru').classList.remove('tampil');
+    }
+    e.stopPropagation();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && /^[1-9]$/.test(e.key)) {
+      var idx = parseInt(e.key, 10) - 1;
+      if (daftar[idx]) pilih(daftar[idx].id);
+    }
+  });
+
+  Promise.all([invoke('daftar_profil'), invoke('profil_aktif'), invoke('ambil_bahasa')]).then(function(h){
+    daftar = h[0] || [];
+    aktif = h[1] && daftar.some(function(p){ return p.id === h[1]; })
+      ? h[1] : (daftar.length ? daftar[0].id : null);
+    terapkanBahasa(h[2] || 'en');
+  });
+
+  // Gerbang tingkat (v0.1.4): label paket di bar + tombol Hub + kontrol
+  // Tidurkan semua. Penegakan aslinya di inti Rust; di sini tampilannya.
+  var infoPaket = null;
+  invoke('info_paket').then(function(info){
+    infoPaket = info;
+    var label = info.nama + ' · ' + info.terpakai + '/' + (info.batas === null ? '∞' : info.batas);
+    document.getElementById('paket').textContent = label;
+    var hubBtn = document.getElementById('tombol-hub');
+    if (!info.hub) hubBtn.classList.add('terkunci');
+    if (info.fitur_lanjut) {
+      document.getElementById('tombol-tidur-semua').style.display = '';
+    }
+  }).catch(function(){});
+
+  document.getElementById('tombol-hub').addEventListener('click', function(){
+    if (infoPaket && !infoPaket.hub) {
+      statusEl.textContent = T.hubLock;
+      setTimeout(function(){ statusEl.textContent = ''; }, 3200);
+      return;
+    }
+    invoke('buka_hub').catch(function(err){
+      statusEl.textContent = String(err);
+      setTimeout(function(){ statusEl.textContent = ''; }, 3200);
+    });
+  });
+
+  var tidurSemuaJalan = false;
+  document.getElementById('tombol-tidur-semua').addEventListener('click', function(){
+    if (tidurSemuaJalan) return;
+    tidurSemuaJalan = true;
+    var tombol = document.getElementById('tombol-tidur-semua');
+    tombol.classList.add('sibuk');
+    statusEl.textContent = T.sleepingAll;
+    invoke('tidurkan_semua').then(function(){
+      statusEl.textContent = '';
+      segarkanTitikTidur();
+    }).catch(function(err){
+      statusEl.textContent = String(err);
+      setTimeout(function(){ statusEl.textContent = ''; }, 3200);
+    }).finally(function(){
+      tidurSemuaJalan = false;
+      tombol.classList.remove('sibuk');
+    });
+  });
+
+  // DeepSleep: titik tab profil yang sedang tidur jadi abu. Polling
+  // ringan; hanya mengubah kelas titik, tidak me-render ulang tab.
+  function segarkanTitikTidur(){
+    invoke('profil_tidur').then(function(tidur){
+      daftar.forEach(function(p){
+        var el = document.getElementById('tab-' + p.id);
+        if (!el) return;
+        var dot = el.querySelector('.dot');
+        if (!dot) return;
+        var sedangTidur = tidur.indexOf(p.id) >= 0;
+        dot.classList.toggle('tidur', sedangTidur);
+        el.title = sedangTidur ? T.sleeping : '';
+      });
+    }).catch(function(){});
+  }
+  setInterval(segarkanTitikTidur, 4000);
+</script>
+</body>
+</html>

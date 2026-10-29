@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Osvyn</title>
+<style>
+  html, body { margin:0; padding:0; height:100%; background:#ffffff; overflow:hidden; }
+  body { display:flex; align-items:center; justify-content:center; cursor:pointer;
+         font-family:Poppins, "Segoe UI", system-ui, sans-serif; -webkit-user-select:none; user-select:none; }
+  #nama { font-weight:700; font-size:64px; letter-spacing:-1.5px; color:#101014; opacity:0;
+          animation: masuk .8s cubic-bezier(.22,.8,.3,1) .1s forwards, keluar .5s ease 5.5s forwards; }
+  #nama .titik { display:inline-block; width:13px; height:13px; border-radius:50%; background:#15b3da; margin-left:5px; }
+  @keyframes masuk { from { opacity:0; transform:scale(.96) translateY(8px); } to { opacity:1; transform:scale(1) translateY(0); } }
+  @keyframes keluar { from { opacity:1; } to { opacity:0; } }
+</style>
+</head>
+<body>
+  <div id="nama">Osvyn<span class="titik"></span></div>
+<script>
+  var selesai = false;
+  function tutup() {
+    if (selesai) return; selesai = true;
+    try { window.__TAURI__.core.invoke('tutup_splash'); } catch (e) {}
+  }
+  document.addEventListener('click', tutup);
+  setTimeout(tutup, 6000);
+</script>
+</body>
+</html>

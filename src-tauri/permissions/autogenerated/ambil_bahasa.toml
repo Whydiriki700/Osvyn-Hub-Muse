@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-ambil-bahasa"
+description = "Enables the ambil_bahasa command without any pre-configured scope."
+commands.allow = ["ambil_bahasa"]
+
+[[permission]]
+identifier = "deny-ambil-bahasa"
+description = "Denies the ambil_bahasa command without any pre-configured scope."
+commands.deny = ["ambil_bahasa"]

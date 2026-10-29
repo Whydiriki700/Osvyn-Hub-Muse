@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-tandai-hub"
+description = "Enables the tandai_hub command without any pre-configured scope."
+commands.allow = ["tandai_hub"]
+
+[[permission]]
+identifier = "deny-tandai-hub"
+description = "Denies the tandai_hub command without any pre-configured scope."
+commands.deny = ["tandai_hub"]

@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-tutup-splash"
+description = "Enables the tutup_splash command without any pre-configured scope."
+commands.allow = ["tutup_splash"]
+
+[[permission]]
+identifier = "deny-tutup-splash"
+description = "Denies the tutup_splash command without any pre-configured scope."
+commands.deny = ["tutup_splash"]

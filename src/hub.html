@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Osvyn Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#101014; --ink-2:#3c3f47; --ink-3:#83878f;
+    --garis:#e2e2e8; --garis-lembut:#f0f0f3;
+    --biru:#2b6ff2; --biru-gelap:#1e56c8; --biru-bg:#eef4fe;
+    --cyan:#15b3da;
+    --bg:#fbfbfc; --panel:#ffffff;
+    --hijau:#1d9e57; --hijau-bg:#e5f6ec;
+    --abu-bg:#f1f1f4;
+    --kuning:#8a5c00; --kuning-bg:#fdf3e0;
+    --merah:#b3372f; --merah-bg:#fdecea;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ overflow-x:clip; }
+  body{ font-family:"Segoe UI", system-ui, sans-serif; background:var(--bg); color:var(--ink); }
+  .aplikasi{ display:flex; min-height:100vh; }
+  @keyframes hubMasuk{ from{ opacity:0; transform:translateY(14px) scale(.985); } to{ opacity:1; transform:translateY(0) scale(1); } }
+  html.masuk .aplikasi{ animation:hubMasuk .34s cubic-bezier(.21,.9,.28,1); }
+
+  .sisi{ width:264px; flex:0 0 264px; background:var(--panel); border-right:1px solid var(--garis);
+         display:flex; flex-direction:column; padding:18px 14px; min-height:100vh; }
+  .merek{ font-family:Poppins, "Segoe UI", sans-serif; font-weight:700; font-size:21px; letter-spacing:-.6px; padding:2px 8px 0; }
+  .merek .titik{ display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--cyan); margin-left:2px; }
+  .merek-sub{ font-size:12px; color:var(--ink-3); padding:3px 8px 14px; }
+  .nav{ display:flex; flex-direction:column; gap:2px; }
+  .nav a{ display:flex; align-items:center; justify-content:space-between; text-decoration:none; color:var(--ink-2);
+          font-size:13.5px; font-weight:500; padding:8px 10px; border-radius:9px; cursor:pointer;
+          transition:background-color .18s ease, color .18s ease, transform .12s ease; }
+  .nav a:active{ transform:scale(.98); }
+  .nav a:hover{ background:var(--garis-lembut); }
+  .nav a.aktif{ background:var(--biru-bg); color:var(--biru-gelap); font-weight:600; }
+  .nav .kunci{ font-size:11px; color:var(--ink-3); border:1px solid var(--garis); border-radius:99px; padding:1px 8px; }
+  .label-seksi{ font-size:11px; letter-spacing:.8px; text-transform:uppercase; color:var(--ink-3); margin:20px 8px 8px; }
+  .daftar-profil{ display:flex; flex-direction:column; gap:2px; overflow-y:auto; }
+  .mini-profil{ display:flex; align-items:center; gap:9px; padding:7px 10px; border-radius:9px; cursor:pointer;
+                transition:background-color .18s ease, transform .12s ease; }
+  .mini-profil:active{ transform:scale(.98); }
+  .mini-profil:hover{ background:var(--garis-lembut); }
+  .mini-profil.aktif{ background:var(--biru-bg); }
+  .mini-profil .nama{ font-size:13px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .avatar{ width:30px; height:30px; flex:0 0 30px; border-radius:50%; color:#fff; font-size:12px; font-weight:700;
+           display:flex; align-items:center; justify-content:center; position:relative; }
+  .avatar .dot{ position:absolute; right:-1px; bottom:-1px; width:9px; height:9px; border-radius:50%;
+                background:#c9ccd4; border:2px solid #fff; }
+  .avatar .dot.hijau{ background:var(--hijau); }
+  .avatar img.foto{ width:100%; height:100%; object-fit:cover; border-radius:50%; display:block; }
+  .avatar.ada-foto{ background:transparent !important; }
+  .sisi-bawah{ margin-top:auto; border:1px solid var(--garis); border-radius:12px; padding:12px 14px; }
+  .sisi-bawah .paket{ font-size:13px; font-weight:700; }
+  .sisi-bawah .rinci{ font-size:12px; color:var(--ink-3); margin-top:3px; line-height:1.55; }
+
+  .utama{ flex:1; padding:26px 34px 40px; min-width:0; }
+  .kepala{ display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+  h1{ font-family:Poppins, "Segoe UI", sans-serif; font-size:24px; font-weight:700; letter-spacing:-.5px; }
+  .sub{ font-size:13.5px; color:var(--ink-3); margin-top:4px; }
+  .aksi{ display:flex; gap:9px; flex-wrap:wrap; }
+  button{ font-family:inherit; font-size:13px; font-weight:600; border-radius:9px; padding:9px 15px; cursor:pointer; white-space:nowrap;
+          transition:transform .12s ease, background-color .18s ease, color .18s ease, border-color .18s ease, box-shadow .18s ease, opacity .18s ease; }
+  .btn-utama{ background:var(--biru); border:1px solid var(--biru); color:#fff; }
+  .btn-utama:hover{ background:var(--biru-gelap); }
+  .btn-hantu{ background:var(--panel); border:1px solid var(--garis); color:var(--ink-2); }
+  .btn-hantu:hover{ border-color:var(--biru); color:var(--biru-gelap); }
+  .btn-kecil{ padding:6px 12px; font-size:12.5px; }
+  .btn-bahaya{ background:var(--merah-bg); border:1px solid #efc4c0; color:var(--merah); }
+  .btn-bahaya:hover{ border-color:var(--merah); }
+
+  .statistik{ display:flex; gap:0; margin-top:24px; border-top:1px solid var(--garis); border-bottom:1px solid var(--garis); flex-wrap:wrap; }
+  .statistik .sel{ padding:13px 26px 13px 0; margin-right:26px; }
+  .statistik .angka{ font-size:19px; font-weight:700; }
+  .statistik .label{ font-size:12px; color:var(--ink-3); margin-top:1px; }
+
+  .baris{ display:flex; align-items:center; gap:14px; background:var(--panel); border:1px solid var(--garis);
+          border-radius:14px; padding:15px 18px; margin-top:12px; }
+  .baris.dibuka{ border-color:var(--biru); box-shadow:0 0 0 1px var(--biru); }
+  .baris .avatar{ width:42px; height:42px; flex-basis:42px; font-size:15px; }
+  .baris .avatar .dot{ width:11px; height:11px; }
+  .identitas{ flex:1; min-width:0; }
+  .identitas .nama{ font-size:14.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .identitas .meta{ font-size:12.5px; color:var(--ink-3); margin-top:2px; }
+  .chip{ font-size:11.5px; font-weight:700; padding:3px 10px; border-radius:99px; white-space:nowrap; }
+  .chip-aktif{ background:var(--hijau-bg); color:var(--hijau); }
+  .chip-tidur{ background:var(--abu-bg); color:var(--ink-2); }
+  .chip-login{ background:var(--kuning-bg); color:var(--kuning); }
+  .baris .tombol{ display:flex; gap:8px; align-items:center; }
+  .menu{ background:none; border:none; font-size:17px; color:var(--ink-3); padding:4px 8px; }
+  .panel-kecil{ display:none; background:var(--panel); border:1px solid var(--garis); border-top:none;
+                border-radius:0 0 14px 14px; padding:12px 18px; margin-top:-13px; padding-top:22px; }
+  .panel-kecil.tampil{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; animation:panelMasuk .22s ease; }
+  @keyframes panelMasuk { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } }
+  .baris.masuk{ animation:barisMasuk .38s ease both; }
+  @keyframes barisMasuk { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+  body:has(.panel-kecil.tampil) #btn-tambah{ background:var(--biru-gelap); }
+  .panel-kecil input{ border:1px solid var(--garis); border-radius:9px; padding:8px 12px; font:inherit;
+                      font-size:13px; width:220px; outline:none; }
+  .panel-kecil input:focus{ border-color:var(--biru); }
+  .panel-kecil .teks{ font-size:13px; color:var(--ink-2); }
+  .catatan{ margin-top:22px; font-size:12.5px; color:var(--ink-3); line-height:1.7; }
+  .terkunci-kotak{ max-width:560px; margin:60px auto; text-align:center; border:1px solid var(--garis);
+                   background:var(--panel); border-radius:16px; padding:36px 30px; }
+  .terkunci-kotak h2{ font-family:Poppins, "Segoe UI", sans-serif; font-size:20px; margin-bottom:10px; }
+  .terkunci-kotak p{ font-size:14px; color:var(--ink-2); line-height:1.65; }
+
+  button:focus-visible, input:focus-visible, a:focus-visible, select:focus-visible{ outline:2px solid var(--biru); outline-offset:2px; }
+  .btn-utama:active, .btn-hantu:active, .btn-bahaya:active{ transform:translateY(1px) scale(.96); }
+  .menu:active{ transform:scale(.88); }
+  button:disabled:active{ transform:none; }
+  button:disabled{ opacity:.5; cursor:default; }
+
+  .meta-tambahan{ display:flex; gap:6px; align-items:center; margin-top:6px; flex-wrap:wrap; }
+  .chip-grup{ background:var(--biru-bg); color:var(--biru-gelap); }
+  .chip-temp{ background:var(--kuning-bg); color:var(--kuning); }
+  .chip-split{ background:var(--abu-bg); color:var(--ink-2); }
+  .limit-teks{ font-size:12px; color:var(--ink-2); white-space:nowrap; }
+
+  .panel-kecil.kolom{ flex-direction:column; align-items:stretch; gap:12px; }
+  .medis{ display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; }
+  .medis label{ display:flex; flex-direction:column; gap:4px; font-size:11px; letter-spacing:.6px;
+                text-transform:uppercase; color:var(--ink-3); }
+  .medis input{ border:1px solid var(--garis); border-radius:9px; padding:8px 12px; font:inherit;
+                font-size:13px; outline:none; background:var(--panel); color:var(--ink); }
+  .medis input:focus{ border-color:var(--biru); }
+  .medis input.grup{ width:150px; }
+  .medis input.catatan-in{ width:230px; }
+  .medis input.persen{ width:92px; }
+  .medis label.cek{ flex-direction:row; align-items:center; gap:7px; text-transform:none;
+                    font-size:12.5px; color:var(--ink-2); letter-spacing:0; padding-bottom:9px; }
+  .tersimpan{ font-size:12.5px; color:var(--hijau); align-self:center; }
+
+  .seksi{ margin-top:30px; border-top:1px solid var(--garis); padding-top:18px; }
+  .seksi h2{ font-family:Poppins, "Segoe UI", sans-serif; font-size:16.5px; font-weight:700; letter-spacing:-.3px; }
+  .grup-kartu{ display:flex; align-items:center; gap:12px; background:var(--panel); border:1px solid var(--garis);
+               border-radius:14px; padding:13px 18px; margin-top:12px; flex-wrap:wrap; }
+  .grup-kartu .gnama{ font-size:14px; font-weight:700; }
+  .grup-kartu .gmeta{ font-size:12.5px; color:var(--ink-3); }
+  .grup-kartu label{ display:flex; flex-direction:column; gap:4px; font-size:11px; letter-spacing:.6px;
+                     text-transform:uppercase; color:var(--ink-3); }
+  .grup-kartu input[type=time]{ border:1px solid var(--garis); border-radius:9px; padding:7px 10px;
+                                font:inherit; font-size:13px; outline:none; background:var(--panel); color:var(--ink); }
+  .grup-kartu input[type=time]:focus{ border-color:var(--biru); }
+  .grup-kartu .spasi{ flex:1; }
+  .akt-baris{ display:flex; gap:10px; align-items:baseline; padding:8px 2px;
+              border-bottom:1px solid var(--garis-lembut); font-size:13px; }
+  .akt-baris:last-child{ border-bottom:none; }
+  .akt-baris .waktu{ color:var(--ink-3); font-size:12px; white-space:nowrap; min-width:128px; }
+  .akt-baris .anama{ font-weight:600; }
+  .akt-kosong{ font-size:13px; color:var(--ink-3); padding-top:10px; }
+
+  @media (max-width:760px){
+    .sisi{ display:none; }
+    .utama{ padding:18px 16px 32px; }
+    .baris{ flex-wrap:wrap; }
+    .akt-baris .waktu{ min-width:0; }
+  }
+</style>
+</head>
+<body>
+<div class="aplikasi" id="aplikasi" style="display:none">
+
+  <aside class="sisi">
+    <div class="merek">Osvyn<span class="titik"></span></div>
+    <div class="merek-sub" id="merek-sub">Multi-account manager for Muse</div>
+    <nav class="nav">
+      <a href="#" class="aktif">Hub</a>
+      <a href="#" id="nav-profil">Profiles</a>
+      <a href="#" id="nav-lisensi">License <span class="kunci" id="nav-paket">Hub</span></a>
+    </nav>
+
+    <div class="label-seksi" id="label-profil">Profiles</div>
+    <div class="daftar-profil" id="daftar-profil"></div>
+
+    <div class="sisi-bawah">
+      <div class="paket" id="kartu-paket">Hub plan</div>
+      <div class="rinci" id="kartu-rinci"></div>
+    </div>
+  </aside>
+
+  <main class="utama">
+    <div class="kepala">
+      <div>
+        <h1>Hub</h1>
+        <div class="sub" id="sub-hub">All your Muse profiles in one place. Open, put to sleep, or manage them without switching tabs one by one.</div>
+      </div>
+      <div class="aksi">
+        <button class="btn-hantu" id="btn-kembali">Back to profiles</button>
+        <button class="btn-hantu" id="btn-tidur-semua">Sleep all</button>
+        <button class="btn-utama" id="btn-tambah">+ New profile</button>
+      </div>
+    </div>
+
+    <div class="statistik" id="statistik"></div>
+    <div id="daftar-baris"></div>
+
+    <section class="seksi" id="seksi-grup">
+      <h2 id="judul-grup">Groups and routines</h2>
+      <div id="daftar-grup"></div>
+      <div class="catatan" id="nota-jadwal" style="margin-top:12px">Schedules run while Osvyn is open. Times are Western Indonesia Time (WIB).</div>
+    </section>
+
+    <section class="seksi" id="seksi-aktivitas">
+      <h2 id="judul-aktivitas">Recent activity</h2>
+      <div id="daftar-aktivitas"></div>
+    </section>
+
+    <div class="catatan" id="catatan">Sleeping profiles release their page from memory and are rebuilt exactly where they left off when reopened. On the Bundle Studio and Hub plans, DeepSleep also puts profiles to sleep automatically after 3 minutes of inactivity.</div>
+  </main>
+
+</div>
+
+<datalist id="opsi-grup"></datalist>
+
+<div class="terkunci-kotak" id="kotak-terkunci" style="display:none">
+  <h2>Hub</h2>
+  <p id="teks-terkunci">The Hub is available on the Hub plan.</p>
+  <div style="margin-top:18px"><button class="btn-hantu" id="btn-tutup-terkunci">Back to profiles</button></div>
+</div>
+
+<script>
+  var AURA = ['#2b6ff2','#7c5cd6','#0e9f8a','#e08a1e','#d6577a','#5b7a99'];
+  var KATA = {
+    en: { subMgr:"Multi-account manager for Muse", profiles:"Profiles", planWord:"plan",
+      sub:"All your Muse profiles in one place. Open, put to sleep, or manage them without switching tabs one by one.",
+      back:"Back to profiles", sleepAll:"Sleep all", newProfile:"+ New profile",
+      stProfiles:"Profiles", stActive:"Active and signed in", stSleep:"Asleep (RAM free)", stNotYet:"Not signed in yet",
+      openNow:"Open in this window, active now", signedIn:"Signed in", lastActive:"last active ",
+      sleptMeta:"Put to sleep by DeepSleep, last active ", sleptPlain:"Put to sleep by DeepSleep",
+      neverSigned:"Profile created, not signed in yet",
+      chipOpen:"Active", chipActive:"Active", chipSleep:"Asleep", chipNotYet:"Not signed in",
+      open:"Open", wake:"Wake", sleep:"Put to sleep", rename:"Rename", del:"Delete", save:"Save", cancel:"Cancel",
+      confirmDel:"Delete \"{name}\"? Its sign-in data will be removed too.",
+      phNew:"New profile name", create:"Create",
+      usedOf:" of ", profilesUsed:" profiles in use", unlimited:"unlimited", serial:"Serial ", activeWord:"active",
+      note:"Sleeping profiles release their page from memory and are rebuilt exactly where they left off when reopened. On the Bundle Studio and Hub plans, DeepSleep also puts profiles to sleep automatically after 3 minutes of inactivity.",
+      locked:"The Hub is available on the Hub plan. Your current plan is ",
+      justNow:"just now", minAgo:" min ago", hourAgo:" h ago", dayAgo:" d ago",
+      limitMsg:"Profile limit reached for your plan.", fail:"Failed: ", grpLabel:"Group", noteLabel:"Note", resetLabel:"Limit resets at", pctLabel:"Used (%)", pctAuto:"blank = not tracked", tempLabel:"Temporary profile, data wiped on next start", tempBadge:"Temporary", splitBtn:"Split view", splitClose:"Close split", splitWith:"Shown in split view", groupsTitle:"Groups and routines", groupOpen:"Open group", wakeLabel:"Wake", sleepLabel:"Sleep", saveSchedule:"Save schedule", members:"{n} profiles", scheduleNote:"Schedules run while Osvyn is open. Times are Western Indonesia Time (WIB).", activityTitle:"Recent activity", noActivity:"No activity recorded yet.", noGroup:"No group", resetIn:"resets in ", resetDue:"reset due", usedPct:"{p}% used", savedMsg:"Saved.", act_buka:"opened", act_tidur:"put to sleep", act_tambah:"created", act_split:"opened in split view", act_ganti_nama:"renamed", act_hapus:"deleted" },
+    id: { subMgr:"Pengelola multi-akun Muse", profiles:"Profil", planWord:"Paket",
+      sub:"Semua profil Muse dalam satu tempat. Buka, tidurkan, atau atur tanpa pindah tab satu-satu.",
+      back:"Kembali ke profil", sleepAll:"Tidurkan semua", newProfile:"+ Profil baru",
+      stProfiles:"Profil", stActive:"Aktif dan login", stSleep:"Tidur (RAM bebas)", stNotYet:"Belum login",
+      openNow:"Sedang dibuka di jendela ini, aktif sekarang", signedIn:"Login", lastActive:"terakhir aktif ",
+      sleptMeta:"Ditidurkan DeepSleep, terakhir aktif ", sleptPlain:"Ditidurkan DeepSleep",
+      neverSigned:"Profil dibuat, belum pernah login",
+      chipOpen:"Aktif", chipActive:"Aktif", chipSleep:"Tidur", chipNotYet:"Belum login",
+      open:"Buka", wake:"Bangunkan", sleep:"Tidurkan", rename:"Ganti nama", del:"Hapus", save:"Simpan", cancel:"Batal",
+      confirmDel:"Hapus \"{name}\"? Data login di dalamnya ikut terhapus.",
+      phNew:"Nama profil baru", create:"Buat",
+      usedOf:" dari ", profilesUsed:" profil terpakai", unlimited:"tanpa batas", serial:"Serial ", activeWord:"aktif",
+      note:"Profil yang tidur halamannya dilepas dari memori dan dibangun lagi persis di tempat terakhir saat dibuka. DeepSleep menidurkan profil yang tidak aktif selama 3 menit secara otomatis pada paket Bundle Studio dan Hub.",
+      locked:"Hub tersedia di paket Hub. Paket Anda saat ini ",
+      justNow:"baru saja", minAgo:" menit lalu", hourAgo:" jam lalu", dayAgo:" hari lalu",
+      limitMsg:"Batas profil paket Anda tercapai.", fail:"Gagal: ", grpLabel:"Grup", noteLabel:"Catatan", resetLabel:"Limit reset pada", pctLabel:"Terpakai (%)", pctAuto:"kosong = tidak dilacak", tempLabel:"Profil sementara, data dihapus saat start berikutnya", tempBadge:"Sementara", splitBtn:"Tampilan belah", splitClose:"Tutup belah", splitWith:"Tampil di tampilan belah", groupsTitle:"Grup dan rutinitas", groupOpen:"Buka grup", wakeLabel:"Bangun", sleepLabel:"Tidur", saveSchedule:"Simpan jadwal", members:"{n} profil", scheduleNote:"Jadwal berjalan selama Osvyn terbuka. Waktu mengikuti WIB.", activityTitle:"Aktivitas terakhir", noActivity:"Belum ada aktivitas tercatat.", noGroup:"Tanpa grup", resetIn:"reset dalam ", resetDue:"sudah waktunya reset", usedPct:"{p}% terpakai", savedMsg:"Tersimpan.", act_buka:"dibuka", act_tidur:"ditidurkan", act_tambah:"dibuat", act_split:"dibuka di tampilan belah", act_ganti_nama:"diganti nama", act_hapus:"dihapus" },
+    es: {
+      subMgr:"Gestor multicuenta para Muse", profiles:"Perfiles", planWord:"Plan",
+      sub:"Todos tus perfiles de Muse en un solo lugar. Ábrelos, ponlos en reposo o gestiónalos sin cambiar de pestaña uno por uno.",
+      back:"Volver a perfiles", sleepAll:"Dormir todo", newProfile:"+ Nuevo perfil", stProfiles:"Perfiles",
+      stActive:"Activos y con sesión", stSleep:"En reposo (RAM libre)", stNotYet:"Sin sesión todavía",
+      openNow:"Abierto en esta ventana, activo ahora", signedIn:"Sesión iniciada", lastActive:"última actividad ",
+      sleptMeta:"Puesto en reposo por DeepSleep, última actividad ", sleptPlain:"Puesto en reposo por DeepSleep",
+      neverSigned:"Perfil creado, aún sin sesión", chipOpen:"Activo", chipActive:"Activo", chipSleep:"En reposo",
+      chipNotYet:"Sin sesión", open:"Abrir", wake:"Activar", sleep:"Poner en reposo", rename:"Renombrar",
+      del:"Eliminar", save:"Guardar", cancel:"Cancelar",
+      confirmDel:"¿Eliminar \"{name}\"? Sus datos de inicio de sesión también se borrarán.",
+      phNew:"Nombre del perfil nuevo", create:"Crear", usedOf:" de ", profilesUsed:" perfiles en uso",
+      unlimited:"sin límite", serial:"Serie ", activeWord:"activo",
+      note:"Los perfiles en reposo liberan su página de la memoria y se reconstruyen exactamente donde quedaron al reabrirlos. En los planes Bundle Studio y Hub, DeepSleep también pone los perfiles en reposo tras 3 minutos de inactividad.",
+      locked:"El Hub está disponible en el plan Hub. Tu plan actual es ", justNow:"ahora mismo", minAgo:" min atrás",
+      hourAgo:" h atrás", dayAgo:" d atrás", limitMsg:"Límite de perfiles de tu plan alcanzado.", fail:"Error: ",
+      grpLabel:"Grupo", noteLabel:"Nota", resetLabel:"El límite se reinicia el", pctLabel:"Usado (%)",
+      pctAuto:"vacío = sin seguimiento", tempLabel:"Perfil temporal, los datos se borran al próximo inicio",
+      tempBadge:"Temporal", splitBtn:"Vista dividida", splitClose:"Cerrar división",
+      splitWith:"Mostrado en vista dividida", groupsTitle:"Grupos y rutinas", groupOpen:"Abrir grupo",
+      wakeLabel:"Activar", sleepLabel:"Dormir", saveSchedule:"Guardar horario", members:"{n} perfiles",
+      scheduleNote:"Los horarios se ejecutan mientras Osvyn está abierto. Hora de Indonesia occidental (WIB).",
+      activityTitle:"Actividad reciente", noActivity:"Aún no hay actividad registrada.", noGroup:"Sin grupo",
+      resetIn:"se reinicia en ", resetDue:"reinicio vencido", usedPct:"{p}% usado", savedMsg:"Guardado.",
+      act_buka:"abierto", act_tidur:"puesto en reposo", act_tambah:"creado", act_split:"abierto en vista dividida",
+      act_ganti_nama:"renombrado", act_hapus:"eliminado" },
+    pt: {
+      subMgr:"Gerenciador multcontas para Muse", profiles:"Perfis", planWord:"Plano",
+      sub:"Todos os seus perfis do Muse em um só lugar. Abra, coloque em repouso ou gerencie sem trocar de aba um por um.",
+      back:"Voltar aos perfis", sleepAll:"Repousar tudo", newProfile:"+ Novo perfil", stProfiles:"Perfis",
+      stActive:"Ativos e conectados", stSleep:"Em repouso (RAM livre)", stNotYet:"Ainda sem login",
+      openNow:"Aberto nesta janela, ativo agora", signedIn:"Conectado", lastActive:"última atividade ",
+      sleptMeta:"Colocado em repouso pelo DeepSleep, última atividade ",
+      sleptPlain:"Colocado em repouso pelo DeepSleep", neverSigned:"Perfil criado, ainda sem login", chipOpen:"Ativo",
+      chipActive:"Ativo", chipSleep:"Em repouso", chipNotYet:"Sem login", open:"Abrir", wake:"Ativar",
+      sleep:"Colocar em repouso", rename:"Renomear", del:"Excluir", save:"Salvar", cancel:"Cancelar",
+      confirmDel:"Excluir \"{name}\"? Os dados de login dele também serão removidos.", phNew:"Nome do novo perfil",
+      create:"Criar", usedOf:" de ", profilesUsed:" perfis em uso", unlimited:"ilimitado", serial:"Série ",
+      activeWord:"ativo",
+      note:"Perfis em repouso liberam a página da memória e são reconstruídos exatamente onde pararam ao reabrir. Nos planos Bundle Studio e Hub, o DeepSleep também coloca perfis em repouso após 3 minutos de inatividade.",
+      locked:"O Hub está disponível no plano Hub. Seu plano atual é ", justNow:"agora mesmo", minAgo:" min atrás",
+      hourAgo:" h atrás", dayAgo:" d atrás", limitMsg:"Limite de perfis do seu plano atingido.", fail:"Falha: ",
+      grpLabel:"Grupo", noteLabel:"Nota", resetLabel:"O limite reinicia em", pctLabel:"Usado (%)",
+      pctAuto:"vazio = sem acompanhamento", tempLabel:"Perfil temporário, dados apagados na próxima abertura",
+      tempBadge:"Temporário", splitBtn:"Tela dividida", splitClose:"Fechar divisão",
+      splitWith:"Mostrado em tela dividida", groupsTitle:"Grupos e rotinas", groupOpen:"Abrir grupo",
+      wakeLabel:"Ativar", sleepLabel:"Repousar", saveSchedule:"Salvar agenda", members:"{n} perfis",
+      scheduleNote:"As agendas rodam enquanto o Osvyn está aberto. Horário da Indonésia ocidental (WIB).",
+      activityTitle:"Atividade recente", noActivity:"Nenhuma atividade registrada ainda.", noGroup:"Sem grupo",
+      resetIn:"reinicia em ", resetDue:"reinício vencido", usedPct:"{p}% usado", savedMsg:"Salvo.", act_buka:"aberto",
+      act_tidur:"colocado em repouso", act_tambah:"criado", act_split:"aberto em tela dividida",
+      act_ganti_nama:"renomeado", act_hapus:"excluído" },
+    fr: {
+      subMgr:"Gestionnaire multi-comptes pour Muse", profiles:"Profils", planWord:"Forfait",
+      sub:"Tous vos profils Muse au même endroit. Ouvrez-les, mettez-les en veille ou gérez-les sans changer d'onglet un par un.",
+      back:"Retour aux profils", sleepAll:"Tout mettre en veille", newProfile:"+ Nouveau profil", stProfiles:"Profils",
+      stActive:"Actifs et connectés", stSleep:"En veille (RAM libre)", stNotYet:"Pas encore connecté",
+      openNow:"Ouvert dans cette fenêtre, actif maintenant", signedIn:"Connecté", lastActive:"dernière activité ",
+      sleptMeta:"Mis en veille par DeepSleep, dernière activité ", sleptPlain:"Mis en veille par DeepSleep",
+      neverSigned:"Profil créé, pas encore connecté", chipOpen:"Actif", chipActive:"Actif", chipSleep:"En veille",
+      chipNotYet:"Non connecté", open:"Ouvrir", wake:"Réveiller", sleep:"Mettre en veille", rename:"Renommer",
+      del:"Supprimer", save:"Enregistrer", cancel:"Annuler",
+      confirmDel:"Supprimer « {name} » ? Ses données de connexion seront aussi effacées.",
+      phNew:"Nom du nouveau profil", create:"Créer", usedOf:" sur ", profilesUsed:" profils utilisés",
+      unlimited:"illimité", serial:"Série ", activeWord:"actif",
+      note:"Les profils en veille libèrent leur page de la mémoire et sont reconstruits exactement où ils en étaient à la réouverture. Dans les forfaits Bundle Studio et Hub, DeepSleep met aussi les profils en veille après 3 minutes d'inactivité.",
+      locked:"Le Hub est disponible dans le forfait Hub. Votre forfait actuel est ", justNow:"à l'instant",
+      minAgo:" min", hourAgo:" h", dayAgo:" j", limitMsg:"Limite de profils de votre forfait atteinte.",
+      fail:"Échec : ", grpLabel:"Groupe", noteLabel:"Note", resetLabel:"La limite se réinitialise le",
+      pctLabel:"Utilisé (%)", pctAuto:"vide = non suivi",
+      tempLabel:"Profil temporaire, données effacées au prochain démarrage", tempBadge:"Temporaire",
+      splitBtn:"Vue partagée", splitClose:"Fermer la vue partagée", splitWith:"Affiché en vue partagée",
+      groupsTitle:"Groupes et routines", groupOpen:"Ouvrir le groupe", wakeLabel:"Réveiller", sleepLabel:"Veille",
+      saveSchedule:"Enregistrer l'horaire", members:"{n} profils",
+      scheduleNote:"Les horaires s'exécutent tant qu'Osvyn est ouvert. Heure d'Indonésie occidentale (WIB).",
+      activityTitle:"Activité récente", noActivity:"Aucune activité enregistrée pour l'instant.",
+      noGroup:"Sans groupe", resetIn:"réinitialisation dans ", resetDue:"réinitialisation due", usedPct:"{p}% utilisé",
+      savedMsg:"Enregistré.", act_buka:"ouvert", act_tidur:"mis en veille", act_tambah:"créé",
+      act_split:"ouvert en vue partagée", act_ganti_nama:"renommé", act_hapus:"supprimé" },
+    de: {
+      subMgr:"Multi-Konto-Manager für Muse", profiles:"Profile", planWord:"Tarif",
+      sub:"Alle Ihre Claude-Profile an einem Ort. Öffnen, schlafen legen oder verwalten, ohne einzeln durch Tabs zu wechseln.",
+      back:"Zurück zu Profilen", sleepAll:"Alle schlafen legen", newProfile:"+ Neues Profil", stProfiles:"Profile",
+      stActive:"Aktiv und angemeldet", stSleep:"Schlafend (RAM frei)", stNotYet:"Noch nicht angemeldet",
+      openNow:"In diesem Fenster geöffnet, jetzt aktiv", signedIn:"Angemeldet", lastActive:"zuletzt aktiv ",
+      sleptMeta:"Von DeepSleep schlafen gelegt, zuletzt aktiv ", sleptPlain:"Von DeepSleep schlafen gelegt",
+      neverSigned:"Profil erstellt, noch nicht angemeldet", chipOpen:"Aktiv", chipActive:"Aktiv",
+      chipSleep:"Schlafend", chipNotYet:"Nicht angemeldet", open:"Öffnen", wake:"Aufwecken", sleep:"Schlafen legen",
+      rename:"Umbenennen", del:"Löschen", save:"Speichern", cancel:"Abbrechen",
+      confirmDel:"\"{name}\" löschen? Die Anmeldedaten darin werden mit entfernt.", phNew:"Name des neuen Profils",
+      create:"Erstellen", usedOf:" von ", profilesUsed:" Profile in Nutzung", unlimited:"unbegrenzt", serial:"Serie ",
+      activeWord:"aktiv",
+      note:"Schlafende Profile geben ihre Seite aus dem Speicher frei und werden beim Öffnen exakt am letzten Stand wieder aufgebaut. In den Tarifen Bundle Studio und Hub legt DeepSleep Profile nach 3 Minuten Inaktivität automatisch schlafen.",
+      locked:"Der Hub ist im Hub-Tarif verfügbar. Ihr aktueller Tarif ist ", justNow:"gerade eben", minAgo:" Min. her",
+      hourAgo:" Std. her", dayAgo:" Tg. her", limitMsg:"Profilgrenze Ihres Tarifs erreicht.", fail:"Fehler: ",
+      grpLabel:"Gruppe", noteLabel:"Notiz", resetLabel:"Limit-Reset am", pctLabel:"Genutzt (%)",
+      pctAuto:"leer = nicht verfolgt", tempLabel:"Temporäres Profil, Daten werden beim nächsten Start gelöscht",
+      tempBadge:"Temporär", splitBtn:"Geteilte Ansicht", splitClose:"Teilung schließen",
+      splitWith:"In geteilter Ansicht gezeigt", groupsTitle:"Gruppen und Routinen", groupOpen:"Gruppe öffnen",
+      wakeLabel:"Aufwecken", sleepLabel:"Schlafen", saveSchedule:"Zeitplan speichern", members:"{n} Profile",
+      scheduleNote:"Zeitpläne laufen, solange Osvyn geöffnet ist. Westindonesische Zeit (WIB).",
+      activityTitle:"Letzte Aktivität", noActivity:"Noch keine Aktivität aufgezeichnet.", noGroup:"Keine Gruppe",
+      resetIn:"Reset in ", resetDue:"Reset fällig", usedPct:"{p}% genutzt", savedMsg:"Gespeichert.",
+      act_buka:"geöffnet", act_tidur:"schlafen gelegt", act_tambah:"erstellt",
+      act_split:"in geteilter Ansicht geöffnet", act_ganti_nama:"umbenannt", act_hapus:"gelöscht" },
+    it: {
+      subMgr:"Gestore multi-account per Muse", profiles:"Profili", planWord:"Piano",
+      sub:"Tutti i tuoi profili Muse in un unico posto. Aprili, mettili in pausa o gestiscili senza cambiare scheda uno per uno.",
+      back:"Torna ai profili", sleepAll:"Metti tutto in pausa", newProfile:"+ Nuovo profilo", stProfiles:"Profili",
+      stActive:"Attivi e connessi", stSleep:"In pausa (RAM libera)", stNotYet:"Accesso non ancora effettuato",
+      openNow:"Aperto in questa finestra, attivo ora", signedIn:"Connesso", lastActive:"ultima attività ",
+      sleptMeta:"Messo in pausa da DeepSleep, ultima attività ", sleptPlain:"Messo in pausa da DeepSleep",
+      neverSigned:"Profilo creato, accesso non ancora effettuato", chipOpen:"Attivo", chipActive:"Attivo",
+      chipSleep:"In pausa", chipNotYet:"Non connesso", open:"Apri", wake:"Riattiva", sleep:"Metti in pausa",
+      rename:"Rinomina", del:"Elimina", save:"Salva", cancel:"Annulla",
+      confirmDel:"Eliminare \"{name}\"? Anche i suoi dati di accesso verranno rimossi.",
+      phNew:"Nome del nuovo profilo", create:"Crea", usedOf:" di ", profilesUsed:" profili in uso",
+      unlimited:"illimitato", serial:"Serie ", activeWord:"attivo",
+      note:"I profili in pausa liberano la loro pagina dalla memoria e vengono ricostruiti esattamente dove erano alla riapertura. Nei piani Bundle Studio e Hub, DeepSleep mette in pausa i profili anche dopo 3 minuti di inattività.",
+      locked:"L'Hub è disponibile nel piano Hub. Il tuo piano attuale è ", justNow:"adesso", minAgo:" min fa",
+      hourAgo:" h fa", dayAgo:" g fa", limitMsg:"Limite di profili del piano raggiunto.", fail:"Errore: ",
+      grpLabel:"Gruppo", noteLabel:"Nota", resetLabel:"Il limite si ripristina il", pctLabel:"Usato (%)",
+      pctAuto:"vuoto = non monitorato", tempLabel:"Profilo temporaneo, dati cancellati al prossimo avvio",
+      tempBadge:"Temporaneo", splitBtn:"Vista divisa", splitClose:"Chiudi vista divisa",
+      splitWith:"Mostrato in vista divisa", groupsTitle:"Gruppi e routine", groupOpen:"Apri gruppo",
+      wakeLabel:"Riattiva", sleepLabel:"Pausa", saveSchedule:"Salva orario", members:"{n} profili",
+      scheduleNote:"Gli orari funzionano mentre Osvyn è aperto. Ora dell'Indonesia occidentale (WIB).",
+      activityTitle:"Attività recenti", noActivity:"Nessuna attività registrata finora.", noGroup:"Nessun gruppo",
+      resetIn:"si ripristina tra ", resetDue:"ripristino scaduto", usedPct:"{p}% usato", savedMsg:"Salvato.",
+      act_buka:"aperto", act_tidur:"messo in pausa", act_tambah:"creato", act_split:"aperto in vista divisa",
+      act_ganti_nama:"rinominato", act_hapus:"eliminato" },
+    ru: {
+      subMgr:"Менеджер нескольких аккаунтов для Muse", profiles:"Профили", planWord:"Тариф",
+      sub:"Все ваши профили Muse в одном месте. Открывайте, усыпляйте и управляйте ими, не переключаясь между вкладками по одной.",
+      back:"Назад к профилям", sleepAll:"Усыпить все", newProfile:"+ Новый профиль", stProfiles:"Профили",
+      stActive:"Активны и вошли", stSleep:"Спят (RAM свободна)", stNotYet:"Вход ещё не выполнен",
+      openNow:"Открыт в этом окне, активен сейчас", signedIn:"Вход выполнен", lastActive:"последняя активность ",
+      sleptMeta:"Усыплён DeepSleep, последняя активность ", sleptPlain:"Усыплён DeepSleep",
+      neverSigned:"Профиль создан, вход ещё не выполнен", chipOpen:"Активен", chipActive:"Активен", chipSleep:"Спит",
+      chipNotYet:"Не выполнен вход", open:"Открыть", wake:"Разбудить", sleep:"Усыпить", rename:"Переименовать",
+      del:"Удалить", save:"Сохранить", cancel:"Отмена",
+      confirmDel:"Удалить «{name}»? Данные входа в нём тоже будут удалены.", phNew:"Имя нового профиля",
+      create:"Создать", usedOf:" из ", profilesUsed:" профилей используется", unlimited:"без ограничений",
+      serial:"Серия ", activeWord:"активен",
+      note:"Спящие профили освобождают свою страницу из памяти и при открытии восстанавливаются точно на том месте, где остановились. В тарифах Bundle Studio и Hub DeepSleep также усыпляет профили после 3 минут бездействия.",
+      locked:"Hub доступен в тарифе Hub. Ваш текущий тариф — ", justNow:"только что", minAgo:" мин назад",
+      hourAgo:" ч назад", dayAgo:" дн. назад", limitMsg:"Достигнут предел профилей вашего тарифа.", fail:"Ошибка: ",
+      grpLabel:"Группа", noteLabel:"Заметка", resetLabel:"Лимит сбрасывается", pctLabel:"Использовано (%)",
+      pctAuto:"пусто = не отслеживается", tempLabel:"Временный профиль, данные стираются при следующем запуске",
+      tempBadge:"Временный", splitBtn:"Разделённый вид", splitClose:"Закрыть разделение",
+      splitWith:"Показан в разделённом виде", groupsTitle:"Группы и расписания", groupOpen:"Открыть группу",
+      wakeLabel:"Разбудить", sleepLabel:"Сон", saveSchedule:"Сохранить расписание", members:"{n} профилей",
+      scheduleNote:"Расписания работают, пока Osvyn открыт. Время западно-индонезийское (WIB).",
+      activityTitle:"Последняя активность", noActivity:"Активности пока не записано.", noGroup:"Без группы",
+      resetIn:"сброс через ", resetDue:"время сброса наступило", usedPct:"использовано {p}%", savedMsg:"Сохранено.",
+      act_buka:"открыт", act_tidur:"усыплён", act_tambah:"создан", act_split:"открыт в разделённом виде",
+      act_ganti_nama:"переименован", act_hapus:"удалён" },
+    ar: {
+      subMgr:"مدير متعدد الحسابات لـ Muse", profiles:"الملفات", planWord:"خطة",
+      sub:"كل ملفات Muse الخاصة بك في مكان واحد. افتحها أو نوّمها أو أدرها دون التنقل بين علامات التبويب واحدة تلو الأخرى.",
+      back:"عودة إلى الملفات", sleepAll:"تنويم الكل", newProfile:"+ ملف جديد", stProfiles:"الملفات",
+      stActive:"نشط ومسجل", stSleep:"نائم (ذاكرة حرة)", stNotYet:"غير مسجل بعد",
+      openNow:"مفتوح في هذه النافذة، نشط الآن", signedIn:"مسجل الدخول", lastActive:"آخر نشاط ",
+      sleptMeta:"نوّمه DeepSleep، آخر نشاط ", sleptPlain:"نوّمه DeepSleep",
+      neverSigned:"تم إنشاء الملف، لم يتم تسجيل الدخول بعد", chipOpen:"نشط", chipActive:"نشط", chipSleep:"نائم",
+      chipNotYet:"غير مسجل", open:"فتح", wake:"إيقاظ", sleep:"تنويم", rename:"إعادة تسمية", del:"حذف", save:"حفظ",
+      cancel:"إلغاء", confirmDel:"حذف \"{name}\"؟ ستتم إزالة بيانات تسجيل الدخول فيه أيضًا.", phNew:"اسم الملف الجديد",
+      create:"إنشاء", usedOf:" من ", profilesUsed:" ملف قيد الاستخدام", unlimited:"بلا حدود", serial:"رقم ",
+      activeWord:"نشط",
+      note:"الملفات النائمة تحرر صفحتها من الذاكرة وتُبنى من جديد تمامًا حيث توقفت عند إعادة فتحها. في خطتي Bundle Studio وHub، يقوم DeepSleep أيضًا بتنويم الملفات بعد 3 دقائق من عدم النشاط.",
+      locked:"ميزة Hub متاحة في خطة Hub. خطتك الحالية هي ", justNow:"الآن", minAgo:" دقيقة مضت", hourAgo:" ساعة مضت",
+      dayAgo:" يوم مضى", limitMsg:"تم بلوغ حد الملفات في خطتك.", fail:"فشل: ", grpLabel:"المجموعة", noteLabel:"ملاحظة",
+      resetLabel:"يُعاد تعيين الحد في", pctLabel:"المستخدم (%)", pctAuto:"فارغ = غير متعقَّب",
+      tempLabel:"ملف مؤقت، تُمسح بياناته عند البدء التالي", tempBadge:"مؤقت", splitBtn:"عرض مقسوم",
+      splitClose:"إغلاق التقسيم", splitWith:"معروض في العرض المقسوم", groupsTitle:"المجموعات والروتين",
+      groupOpen:"فتح المجموعة", wakeLabel:"إيقاظ", sleepLabel:"نوم", saveSchedule:"حفظ الجدول", members:"{n} ملف",
+      scheduleNote:"تعمل الجداول أثناء فتح Osvyn. الأوقات بتوقيت غرب إندونيسيا (WIB).", activityTitle:"النشاط الأخير",
+      noActivity:"لا نشاط مسجل بعد.", noGroup:"بدون مجموعة", resetIn:"يُعاد تعيينه بعد ",
+      resetDue:"حان وقت إعادة التعيين", usedPct:"تم استخدام {p}%", savedMsg:"تم الحفظ.", act_buka:"فُتح",
+      act_tidur:"نُوِّم", act_tambah:"أُنشئ", act_split:"فُتح في العرض المقسوم", act_ganti_nama:"أُعيدت تسميته",
+      act_hapus:"حُذف" },
+    tr: {
+      subMgr:"Muse için çoklu hesap yöneticisi", profiles:"Profiller", planWord:"Plan",
+      sub:"Tüm Muse profilleriniz tek yerde. Sekmeler arasında tek tek geçiş yapmadan açın, uyutun veya yönetin.",
+      back:"Profillere dön", sleepAll:"Tümünü uyut", newProfile:"+ Yeni profil", stProfiles:"Profiller",
+      stActive:"Aktif ve oturum açık", stSleep:"Uyuyor (RAM boş)", stNotYet:"Henüz oturum yok",
+      openNow:"Bu pencerede açık, şu an aktif", signedIn:"Oturum açık", lastActive:"son etkinlik ",
+      sleptMeta:"DeepSleep tarafından uyutuldu, son etkinlik ", sleptPlain:"DeepSleep tarafından uyutuldu",
+      neverSigned:"Profil oluşturuldu, henüz oturum açılmadı", chipOpen:"Aktif", chipActive:"Aktif",
+      chipSleep:"Uyuyor", chipNotYet:"Oturum yok", open:"Aç", wake:"Uyandır", sleep:"Uyut", rename:"Yeniden adlandır",
+      del:"Sil", save:"Kaydet", cancel:"İptal",
+      confirmDel:"\"{name}\" silinsin mi? İçindeki oturum verileri de kaldırılır.", phNew:"Yeni profil adı",
+      create:"Oluştur", usedOf:" / ", profilesUsed:" profil kullanımda", unlimited:"sınırsız", serial:"Seri ",
+      activeWord:"aktif",
+      note:"Uyuyan profiller sayfalarını bellekten bırakır ve yeniden açıldığında tam kaldıkları yerde yeniden kurulur. Bundle Studio ve Hub planlarında DeepSleep, profilleri 3 dakika hareketsizlikten sonra da otomatik uyutur.",
+      locked:"Hub, Hub planında kullanılabilir. Şu anki planınız ", justNow:"şimdi", minAgo:" dk önce",
+      hourAgo:" sa önce", dayAgo:" g önce", limitMsg:"Planınızın profil sınırına ulaşıldı.", fail:"Hata: ",
+      grpLabel:"Grup", noteLabel:"Not", resetLabel:"Limit sıfırlanma zamanı", pctLabel:"Kullanılan (%)",
+      pctAuto:"boş = izlenmiyor", tempLabel:"Geçici profil, veriler sonraki başlatmada silinir", tempBadge:"Geçici",
+      splitBtn:"Bölünmüş görünüm", splitClose:"Bölmeyi kapat", splitWith:"Bölünmüş görünümde gösteriliyor",
+      groupsTitle:"Gruplar ve rutinler", groupOpen:"Grubu aç", wakeLabel:"Uyandır", sleepLabel:"Uyut",
+      saveSchedule:"Programı kaydet", members:"{n} profil",
+      scheduleNote:"Programlar Osvyn açıkken çalışır. Saatler Batı Endonezya saatidir (WIB).",
+      activityTitle:"Son etkinlik", noActivity:"Henüz etkinlik kaydedilmedi.", noGroup:"Grup yok",
+      resetIn:"sıfırlamaya ", resetDue:"sıfırlama zamanı geldi", usedPct:"%{p} kullanıldı", savedMsg:"Kaydedildi.",
+      act_buka:"açıldı", act_tidur:"uyutuldu", act_tambah:"oluşturuldu", act_split:"bölünmüş görünümde açıldı",
+      act_ganti_nama:"yeniden adlandırıldı", act_hapus:"silindi" },
+    hi: {
+      subMgr:"Muse के लिए बहु-खाता प्रबंधक", profiles:"प्रोफ़ाइलें", planWord:"प्लान",
+      sub:"आपकी सभी Muse प्रोफ़ाइलें एक ही जगह। एक-एक टैब बदले बिना खोलें, सुलाएँ या प्रबंधित करें।",
+      back:"प्रोफ़ाइलों पर वापस", sleepAll:"सभी को सुलाएँ", newProfile:"+ नई प्रोफ़ाइल", stProfiles:"प्रोफ़ाइलें",
+      stActive:"सक्रिय और साइन इन", stSleep:"सो रही (RAM खाली)", stNotYet:"अभी साइन इन नहीं",
+      openNow:"इस विंडो में खुली, अभी सक्रिय", signedIn:"साइन इन है", lastActive:"अंतिम सक्रिय ",
+      sleptMeta:"DeepSleep ने सुलाया, अंतिम सक्रिय ", sleptPlain:"DeepSleep ने सुलाया",
+      neverSigned:"प्रोफ़ाइल बनाई गई, अभी साइन इन नहीं", chipOpen:"सक्रिय", chipActive:"सक्रिय", chipSleep:"सो रही है",
+      chipNotYet:"साइन इन नहीं", open:"खोलें", wake:"जगाएँ", sleep:"सुलाएँ", rename:"नाम बदलें", del:"हटाएँ",
+      save:"सहेजें", cancel:"रद्द करें", confirmDel:"\"{name}\" हटाएँ? उसमें मौजूद साइन-इन डेटा भी हट जाएगा।",
+      phNew:"नई प्रोफ़ाइल का नाम", create:"बनाएँ", usedOf:" में से ", profilesUsed:" प्रोफ़ाइल उपयोग में",
+      unlimited:"असीमित", serial:"सीरियल ", activeWord:"सक्रिय",
+      note:"सो रही प्रोफ़ाइलें अपनी पेज मेमोरी से छोड़ देती हैं और फिर से खोलने पर ठीक वहीं से बनती हैं जहाँ रुकी थीं। Bundle Studio और Hub प्लान में DeepSleep 3 मिनट की निष्क्रियता के बाद भी प्रोफ़ाइलों को अपने आप सुला देता है।",
+      locked:"Hub, Hub प्लान में उपलब्ध है। आपका वर्तमान प्लान है ", justNow:"अभी-अभी", minAgo:" मिनट पहले",
+      hourAgo:" घंटे पहले", dayAgo:" दिन पहले", limitMsg:"आपके प्लान की प्रोफ़ाइल सीमा पूरी हो गई।", fail:"विफल: ",
+      grpLabel:"समूह", noteLabel:"नोट", resetLabel:"सीमा रीसेट समय", pctLabel:"उपयोग (%)", pctAuto:"खाली = ट्रैक नहीं",
+      tempLabel:"अस्थायी प्रोफ़ाइल, अगली शुरुआत पर डेटा मिट जाएगा", tempBadge:"अस्थायी", splitBtn:"विभाजित दृश्य",
+      splitClose:"विभाजन बंद करें", splitWith:"विभाजित दृश्य में दिख रही है", groupsTitle:"समूह और दिनचर्या",
+      groupOpen:"समूह खोलें", wakeLabel:"जगाएँ", sleepLabel:"सुलाएँ", saveSchedule:"शेड्यूल सहेजें",
+      members:"{n} प्रोफ़ाइल",
+      scheduleNote:"शेड्यूल Osvyn खुले रहने तक चलते हैं। समय पश्चिमी इंडोनेशिया समय (WIB) है।",
+      activityTitle:"हाल की गतिविधि", noActivity:"अभी तक कोई गतिविधि दर्ज नहीं।", noGroup:"कोई समूह नहीं",
+      resetIn:"रीसेट में ", resetDue:"रीसेट का समय हो गया", usedPct:"{p}% उपयोग हुआ", savedMsg:"सहेजा गया।",
+      act_buka:"खोला गया", act_tidur:"सुलाया गया", act_tambah:"बनाया गया", act_split:"विभाजित दृश्य में खोला गया",
+      act_ganti_nama:"नाम बदला गया", act_hapus:"हटाया गया" },
+    zh: {
+      subMgr:"Muse 多账户管理器", profiles:"档案", planWord:"套餐", sub:"把所有 Muse 档案集中在一处。无需逐个切换标签页即可打开、休眠或管理它们。", back:"返回档案",
+      sleepAll:"全部休眠", newProfile:"+ 新档案", stProfiles:"档案", stActive:"活跃且已登录", stSleep:"休眠 (内存已释放)", stNotYet:"尚未登录",
+      openNow:"已在此窗口打开，当前活跃", signedIn:"已登录", lastActive:"最后活跃 ", sleptMeta:"已被 DeepSleep 休眠，最后活跃 ",
+      sleptPlain:"已被 DeepSleep 休眠", neverSigned:"档案已创建，尚未登录", chipOpen:"活跃", chipActive:"活跃", chipSleep:"休眠",
+      chipNotYet:"未登录", open:"打开", wake:"唤醒", sleep:"休眠", rename:"改名", del:"删除", save:"保存", cancel:"取消",
+      confirmDel:"删除\"{name}\"？其中的登录数据也会一并移除。", phNew:"新档案名称", create:"创建", usedOf:" / ", profilesUsed:" 个档案使用中",
+      unlimited:"无限制", serial:"序列号 ", activeWord:"有效",
+      note:"休眠的档案会从内存释放其页面，重新打开时会在离开的位置原样重建。在 Bundle Studio 和 Hub 套餐中，DeepSleep 还会在 3 分钟无活动后自动让档案休眠。",
+      locked:"Hub 在 Hub 套餐中可用。您当前的套餐是 ", justNow:"刚刚", minAgo:" 分钟前", hourAgo:" 小时前", dayAgo:" 天前",
+      limitMsg:"已达到套餐的档案上限。", fail:"失败：", grpLabel:"分组", noteLabel:"备注", resetLabel:"限额重置时间", pctLabel:"已用 (%)",
+      pctAuto:"留空 = 不追踪", tempLabel:"临时档案，下次启动时清除数据", tempBadge:"临时", splitBtn:"分屏", splitClose:"关闭分屏",
+      splitWith:"正在分屏显示", groupsTitle:"分组与例程", groupOpen:"打开分组", wakeLabel:"唤醒", sleepLabel:"休眠", saveSchedule:"保存日程",
+      members:"{n} 个档案", scheduleNote:"日程在 Osvyn 打开期间运行。时间为印度尼西亚西部时间 (WIB)。", activityTitle:"最近活动",
+      noActivity:"暂无活动记录。", noGroup:"无分组", resetIn:"重置倒计时 ", resetDue:"已到重置时间", usedPct:"已用 {p}%", savedMsg:"已保存。",
+      act_buka:"已打开", act_tidur:"已休眠", act_tambah:"已创建", act_split:"已在分屏中打开", act_ganti_nama:"已改名", act_hapus:"已删除" },
+    ja: {
+      subMgr:"Muse のマルチアカウント管理", profiles:"プロフィール", planWord:"プラン",
+      sub:"すべてのClaudeプロフィールを1か所に。タブを1つずつ切り替えずに開く、スリープ、管理ができます。", back:"プロフィールに戻る", sleepAll:"すべてスリープ",
+      newProfile:"+ 新しいプロフィール", stProfiles:"プロフィール", stActive:"アクティブでサインイン済み", stSleep:"スリープ中 (RAM解放)",
+      stNotYet:"まだサインインしていません", openNow:"このウィンドウで開いています、今アクティブ", signedIn:"サインイン済み", lastActive:"最終アクティブ ",
+      sleptMeta:"DeepSleepでスリープ、最終アクティブ ", sleptPlain:"DeepSleepでスリープ", neverSigned:"プロフィール作成済み、まだサインインしていません",
+      chipOpen:"アクティブ", chipActive:"アクティブ", chipSleep:"スリープ中", chipNotYet:"未サインイン", open:"開く", wake:"復帰", sleep:"スリープ",
+      rename:"名前を変更", del:"削除", save:"保存", cancel:"キャンセル", confirmDel:"「{name}」を削除しますか？中のログイン情報も削除されます。",
+      phNew:"新しいプロフィール名", create:"作成", usedOf:" / ", profilesUsed:" 件のプロフィール使用中", unlimited:"無制限", serial:"シリアル ",
+      activeWord:"有効",
+      note:"スリープ中のプロフィールはページをメモリから解放し、再び開くと止まった場所に正確に再構築されます。Bundle StudioとHubプランでは、DeepSleepが3分間操作のないプロフィールも自動でスリープします。",
+      locked:"HubはHubプランで利用できます。現在のプランは ", justNow:"たった今", minAgo:"分前", hourAgo:"時間前", dayAgo:"日前",
+      limitMsg:"プランのプロフィール上限に達しました。", fail:"失敗：", grpLabel:"グループ", noteLabel:"メモ", resetLabel:"上限のリセット時刻",
+      pctLabel:"使用済み (%)", pctAuto:"空欄 = 追跡なし", tempLabel:"一時プロフィール、次回起動時にデータを消去", tempBadge:"一時", splitBtn:"分割表示",
+      splitClose:"分割を閉じる", splitWith:"分割表示中", groupsTitle:"グループとルーティン", groupOpen:"グループを開く", wakeLabel:"復帰",
+      sleepLabel:"スリープ", saveSchedule:"スケジュールを保存", members:"{n} 件のプロフィール",
+      scheduleNote:"スケジュールはOsvynが開いている間だけ動きます。時刻はインドネシア西部時間 (WIB) です。", activityTitle:"最近のアクティビティ",
+      noActivity:"まだアクティビティは記録されていません。", noGroup:"グループなし", resetIn:"リセットまで ", resetDue:"リセット期限です", usedPct:"{p}% 使用済み",
+      savedMsg:"保存しました。", act_buka:"開きました", act_tidur:"スリープしました", act_tambah:"作成しました", act_split:"分割表示で開きました",
+      act_ganti_nama:"名前を変更しました", act_hapus:"削除しました" },
+    ko: {
+      subMgr:"Muse 다중 계정 관리자", profiles:"프로필", planWord:"요금제", sub:"모든 Muse 프로필을 한곳에서. 탭을 하나씩 바꾸지 않고 열고, 절전하고, 관리하세요.",
+      back:"프로필로 돌아가기", sleepAll:"모두 절전", newProfile:"+ 새 프로필", stProfiles:"프로필", stActive:"활성 및 로그인됨",
+      stSleep:"절전 중 (RAM 비움)", stNotYet:"아직 로그인 전", openNow:"이 창에서 열림, 지금 활성", signedIn:"로그인됨", lastActive:"마지막 활동 ",
+      sleptMeta:"DeepSleep으로 절전됨, 마지막 활동 ", sleptPlain:"DeepSleep으로 절전됨", neverSigned:"프로필이 만들어졌고 아직 로그인하지 않았습니다",
+      chipOpen:"활성", chipActive:"활성", chipSleep:"절전 중", chipNotYet:"로그인 전", open:"열기", wake:"깨우기", sleep:"절전",
+      rename:"이름 바꾸기", del:"삭제", save:"저장", cancel:"취소", confirmDel:"\"{name}\"을(를) 삭제할까요? 안의 로그인 데이터도 함께 지워집니다.",
+      phNew:"새 프로필 이름", create:"만들기", usedOf:" / ", profilesUsed:"개 프로필 사용 중", unlimited:"무제한", serial:"시리얼 ",
+      activeWord:"활성",
+      note:"절전 중인 프로필은 페이지를 메모리에서 해제하고, 다시 열면 멈췄던 자리 그대로 다시 만들어집니다. Bundle Studio와 Hub 요금제에서는 DeepSleep이 3분간 사용하지 않은 프로필도 자동으로 절전합니다.",
+      locked:"Hub는 Hub 요금제에서 사용할 수 있습니다. 현재 요금제는 ", justNow:"방금", minAgo:"분 전", hourAgo:"시간 전", dayAgo:"일 전",
+      limitMsg:"요금제의 프로필 한도에 도달했습니다.", fail:"실패: ", grpLabel:"그룹", noteLabel:"메모", resetLabel:"한도 초기화 시각",
+      pctLabel:"사용됨 (%)", pctAuto:"비우면 추적 안 함", tempLabel:"임시 프로필, 다음 시작 때 데이터가 지워집니다", tempBadge:"임시",
+      splitBtn:"분할 보기", splitClose:"분할 닫기", splitWith:"분할 보기로 표시 중", groupsTitle:"그룹 및 루틴", groupOpen:"그룹 열기",
+      wakeLabel:"깨우기", sleepLabel:"절전", saveSchedule:"일정 저장", members:"프로필 {n}개",
+      scheduleNote:"일정은 Osvyn이 열려 있는 동안만 동작합니다. 시간은 인도네시아 서부 시간 (WIB) 입니다.", activityTitle:"최근 활동",
+      noActivity:"아직 기록된 활동이 없습니다.", noGroup:"그룹 없음", resetIn:"초기화까지 ", resetDue:"초기화 시간 도달", usedPct:"{p}% 사용됨",
+      savedMsg:"저장했습니다.", act_buka:"열었습니다", act_tidur:"절전했습니다", act_tambah:"만들었습니다", act_split:"분할 보기로 열었습니다",
+      act_ganti_nama:"이름을 바꿨습니다", act_hapus:"삭제했습니다" }
+  };
+  var AVATAR_KATA = {
+    en:{ avatarLabel:"Profile avatar", avatarPick:"Choose image...", avatarRemove:"Remove avatar" },
+    id:{ avatarLabel:"Avatar profil", avatarPick:"Pilih gambar...", avatarRemove:"Hapus avatar" },
+    es:{ avatarLabel:"Avatar del perfil", avatarPick:"Elegir imagen...", avatarRemove:"Quitar avatar" },
+    pt:{ avatarLabel:"Avatar do perfil", avatarPick:"Escolher imagem...", avatarRemove:"Remover avatar" },
+    fr:{ avatarLabel:"Avatar du profil", avatarPick:"Choisir une image...", avatarRemove:"Retirer l'avatar" },
+    de:{ avatarLabel:"Profil-Avatar", avatarPick:"Bild wählen...", avatarRemove:"Avatar entfernen" },
+    it:{ avatarLabel:"Avatar del profilo", avatarPick:"Scegli immagine...", avatarRemove:"Rimuovi avatar" },
+    ru:{ avatarLabel:"Аватар профиля", avatarPick:"Выбрать изображение...", avatarRemove:"Убрать аватар" },
+    ar:{ avatarLabel:"الصورة الرمزية للملف", avatarPick:"اختر صورة...", avatarRemove:"إزالة الصورة الرمزية" },
+    tr:{ avatarLabel:"Profil avatarı", avatarPick:"Resim seç...", avatarRemove:"Avatarı kaldır" },
+    hi:{ avatarLabel:"प्रोफ़ाइल अवतार", avatarPick:"छवि चुनें...", avatarRemove:"अवतार हटाएँ" },
+    zh:{ avatarLabel:"个人资料头像", avatarPick:"选择图片...", avatarRemove:"移除头像" },
+    ja:{ avatarLabel:"プロフィールアバター", avatarPick:"画像を選ぶ...", avatarRemove:"アバターを削除" },
+    ko:{ avatarLabel:"프로필 아바타", avatarPick:"이미지 선택...", avatarRemove:"아바타 제거" }
+  };
+  Object.keys(AVATAR_KATA).forEach(function(k){ if (KATA[k]) Object.assign(KATA[k], AVATAR_KATA[k]); });
+  var T = KATA.en;
+  var baris = [];
+  var info = null;
+  var jadwal = {};      // { namaGrup: {bangun:'HH:MM', tidur:'HH:MM'} }
+  var aktivitas = [];   // [{waktu, profil, nama, aksi}]
+  var panelUntuk = null; // id profil yang panel rename/hapusnya terbuka
+  var modePanel = null;   // 'nama' | 'hapus' | 'baru'
+
+  var diTauri = !!(window.__TAURI__ && window.__TAURI__.core && window.__TAURI__.core.invoke);
+  var invoke = diTauri ? window.__TAURI__.core.invoke : null;
+
+  // Mode pratinjau di luar aplikasi (QA visual): data contoh, tanpa Rust.
+  var MOCK_BARIS = [
+    { id:'profil-1', nama:'Muse Manager', status:'dibuka', terakhir:0, grup:'Klien', catatan:'Akun utama', reset_unix:0, persen:62, sementara:false, pendamping:false },
+    { id:'profil-2', nama:'Felix Enterprenur Desaigner', status:'aktif', terakhir:0, grup:'Klien', catatan:'', reset_unix:0, persen:-1, sementara:false, pendamping:true },
+    { id:'profil-3', nama:'Merlin Content Creator', status:'tidur', terakhir:0, grup:'Internal', catatan:'Cadangan', reset_unix:0, persen:15, sementara:true, pendamping:false },
+    { id:'profil-4', nama:'Akun Studio', status:'aktif', terakhir:0, grup:'', catatan:'', reset_unix:0, persen:-1, sementara:false, pendamping:false },
+    { id:'profil-5', nama:'Klien Desain', status:'tidur', terakhir:0, grup:'Klien', catatan:'', reset_unix:0, persen:-1, sementara:false, pendamping:false },
+    { id:'profil-6', nama:'Arsip 2025', status:'belum', terakhir:-1, grup:'', catatan:'', reset_unix:0, persen:-1, sementara:false, pendamping:false }
+  ];
+  var MOCK_INFO = { tingkat:4, nama:'Hub', serial:900001, batas:null, terpakai:6, fitur_lanjut:true, hub:true };
+  var MOCK_JADWAL = { 'Klien': { bangun:'07:00', tidur:'22:00' } };
+  var MOCK_AKTIVITAS = [
+    { waktu: Math.floor(Date.now()/1000) - 300, profil:'profil-1', nama:'Muse Manager', aksi:'buka' },
+    { waktu: Math.floor(Date.now()/1000) - 4000, profil:'profil-3', nama:'Merlin Content Creator', aksi:'tidur' },
+    { waktu: Math.floor(Date.now()/1000) - 9000, profil:'profil-6', nama:'Arsip 2025', aksi:'tambah' }
+  ];
+
+  function panggil(nama, args) {
+    if (diTauri) return invoke(nama, args || {});
+    return Promise.resolve(null);
+  }
+
+  function inisial(nama) {
+    var kata = nama.trim().split(/\s+/).filter(Boolean);
+    if (!kata.length) return '?';
+    if (kata.length === 1) return kata[0].slice(0, 2).toUpperCase();
+    return (kata[0][0] + kata[1][0]).toUpperCase();
+  }
+  function aura(i) { return AURA[i % AURA.length]; }
+
+  // Avatar profil Hub: gambar data URL bila pemilik memasangnya (bisa
+  // gambar yang sama dengan avatar akun Muse profil ini), selain itu
+  // inisial bawaan.
+  function isiAvatar(av, p, i) {
+    av.innerHTML = '';
+    if (p.avatar) {
+      av.classList.add('ada-foto');
+      var img = document.createElement('img');
+      img.className = 'foto';
+      img.src = p.avatar;
+      img.alt = p.nama;
+      av.appendChild(img);
+    } else {
+      av.classList.remove('ada-foto');
+      av.style.background = aura(i);
+      av.appendChild(document.createTextNode(inisial(p.nama)));
+    }
+    var dot = el('span', 'dot' + (p.status === 'dibuka' || p.status === 'aktif' ? ' hijau' : ''));
+    av.appendChild(dot);
+    return av;
+  }
+
+  // Baca berkas gambar, potong kotak di tengah, kecilkan ke 128px, dan
+  // kembalikan data URL JPEG supaya profiles.json tetap ringan.
+  function prosesAvatar(berkas, selesai) {
+    if (!berkas) return;
+    var url = URL.createObjectURL(berkas);
+    var img = new Image();
+    img.onload = function() {
+      var sisi = Math.min(img.width, img.height);
+      var kanvas = document.createElement('canvas');
+      kanvas.width = 128; kanvas.height = 128;
+      var ctx = kanvas.getContext('2d');
+      ctx.drawImage(img, (img.width - sisi) / 2, (img.height - sisi) / 2, sisi, sisi, 0, 0, 128, 128);
+      URL.revokeObjectURL(url);
+      selesai(kanvas.toDataURL('image/jpeg', 0.85));
+    };
+    img.onerror = function() { URL.revokeObjectURL(url); };
+    img.src = url;
+  }
+
+  function waktuRelatif(unix) {
+    if (unix === 0) return '';
+    if (unix < 0) return '';
+    var beda = Math.floor(Date.now() / 1000) - unix;
+    if (beda < 90) return T.justNow;
+    if (beda < 3600) return Math.floor(beda / 60) + T.minAgo;
+    if (beda < 86400) return Math.floor(beda / 3600) + T.hourAgo;
+    return Math.floor(beda / 86400) + T.dayAgo;
+  }
+
+  function metaTeks(p) {
+    var rel = waktuRelatif(p.terakhir);
+    if (p.status === 'dibuka') return T.openNow;
+    if (p.status === 'tidur') return (p.terakhir > 0 && rel) ? T.sleptMeta + rel : T.sleptPlain;
+    if (p.status === 'aktif') return rel ? T.signedIn + ', ' + T.lastActive + rel : T.signedIn;
+    return T.neverSigned;
+  }
+
+  function chipKelas(status) {
+    if (status === 'tidur') return 'chip chip-tidur';
+    if (status === 'belum') return 'chip chip-login';
+    return 'chip chip-aktif';
+  }
+  function chipTeks(status) {
+    if (status === 'tidur') return T.chipSleep;
+    if (status === 'belum') return T.chipNotYet;
+    if (status === 'dibuka') return T.chipOpen;
+    return T.chipActive;
+  }
+
+  function sisaReset(unix) {
+    var beda = unix - Math.floor(Date.now() / 1000);
+    if (beda <= 0) return T.resetDue;
+    var h = Math.floor(beda / 3600), m = Math.floor((beda % 3600) / 60), d = Math.floor(h / 24);
+    var fmt = d > 0 ? (d + 'd ' + (h % 24) + 'h') : (h > 0 ? (h + 'h ' + m + 'm') : (Math.max(1, m) + 'm'));
+    return T.resetIn + fmt;
+  }
+
+  function metaTambahan(p) {
+    var ada = p.grup || p.sementara || p.pendamping || p.persen >= 0 || p.reset_unix > 0;
+    if (!ada) return null;
+    var w = el('div', 'meta-tambahan');
+    if (p.grup) w.appendChild(el('span', 'chip chip-grup', p.grup));
+    if (p.sementara) w.appendChild(el('span', 'chip chip-temp', T.tempBadge));
+    if (p.pendamping) w.appendChild(el('span', 'chip chip-split', T.splitWith));
+    var bagian = [];
+    if (p.persen >= 0) bagian.push(T.usedPct.replace('{p}', String(p.persen)));
+    if (p.reset_unix > 0) bagian.push(sisaReset(p.reset_unix));
+    if (bagian.length) w.appendChild(el('span', 'limit-teks', bagian.join(' · ')));
+    return w;
+  }
+
+  function el(tag, kelas, teks) {
+    var e = document.createElement(tag);
+    if (kelas) e.className = kelas;
+    if (teks !== undefined) e.textContent = teks;
+    return e;
+  }
+
+  function render() {
+    // Sidebar mini
+    var wadahMini = document.getElementById('daftar-profil');
+    wadahMini.innerHTML = '';
+    baris.forEach(function(p, i) {
+      var m = el('div', 'mini-profil' + (p.status === 'dibuka' ? ' aktif' : ''));
+      var av = isiAvatar(el('div', 'avatar'), p, i);
+      m.appendChild(av);
+      m.appendChild(el('div', 'nama', p.nama));
+      m.addEventListener('click', function(){ bukaProfil(p.id); });
+      wadahMini.appendChild(m);
+    });
+
+    // Kartu paket di sidebar
+    if (info) {
+      document.getElementById('nav-paket').textContent = info.nama;
+      document.getElementById('kartu-paket').textContent = T.planWord + ' ' + info.nama;
+      var batasTeks = info.batas === null ? T.unlimited : String(info.batas);
+      document.getElementById('kartu-rinci').textContent =
+        info.terpakai + T.usedOf + batasTeks + T.profilesUsed + '\n' +
+        T.serial + info.serial + ', ' + T.activeWord;
+      document.getElementById('kartu-rinci').style.whiteSpace = 'pre-line';
+    }
+
+    // Statistik
+    var nAktif = baris.filter(function(p){ return p.status === 'dibuka' || p.status === 'aktif'; }).length;
+    var nTidur = baris.filter(function(p){ return p.status === 'tidur'; }).length;
+    var nBelum = baris.filter(function(p){ return p.status === 'belum'; }).length;
+    var st = document.getElementById('statistik');
+    st.innerHTML = '';
+    [[baris.length, T.stProfiles], [nAktif, T.stActive], [nTidur, T.stSleep], [nBelum, T.stNotYet]]
+      .forEach(function(sel) {
+        var d = el('div', 'sel');
+        d.appendChild(el('div', 'angka', String(sel[0])));
+        d.appendChild(el('div', 'label', sel[1]));
+        st.appendChild(d);
+      });
+
+    // Baris profil
+    var wadah = document.getElementById('daftar-baris');
+    wadah.innerHTML = '';
+    if (modePanel === 'baru') wadah.appendChild(panelBaru());
+    baris.forEach(function(p, i) {
+      var r = el('div', 'baris' + (p.status === 'dibuka' ? ' dibuka' : ''));
+      if (!window.__barisPernah) window.__barisPernah = {};
+      if (!window.__barisPernah[p.id]) {
+        window.__barisPernah[p.id] = true;
+        r.classList.add('masuk');
+        r.style.animationDelay = Math.min(i * 45, 270) + 'ms';
+      }
+      var av = isiAvatar(el('div', 'avatar'), p, i);
+      r.appendChild(av);
+      var idn = el('div', 'identitas');
+      idn.appendChild(el('div', 'nama', p.nama));
+      idn.appendChild(el('div', 'meta', metaTeks(p)));
+      var mt = metaTambahan(p);
+      if (mt) idn.appendChild(mt);
+      r.appendChild(idn);
+      r.appendChild(el('span', chipKelas(p.status), chipTeks(p.status)));
+      var tb = el('div', 'tombol');
+      if (p.status === 'tidur') {
+        tb.appendChild(tombolAksi(T.wake, true, function(){ bukaProfil(p.id); }));
+      } else if (p.status !== 'dibuka') {
+        tb.appendChild(tombolAksi(T.open, true, function(){ bukaProfil(p.id); }));
+        if (p.status !== 'belum') {
+          tb.appendChild(tombolAksi(T.sleep, false, function(){ tidurkan(p.id); }));
+        }
+      } else {
+        tb.appendChild(tombolAksi(T.sleep, false, function(){ tidurkan(p.id); }));
+      }
+      if (p.pendamping) {
+        tb.appendChild(tombolAksi(T.splitClose, false, function(){ tutupSplit(); }));
+      } else if (p.status !== 'dibuka') {
+        tb.appendChild(tombolAksi(T.splitBtn, false, function(){ bukaSplit(p.id); }));
+      }
+      var menu = el('button', 'menu', '···');
+      menu.title = T.rename + ' / ' + T.del;
+      menu.addEventListener('click', function(){
+        if (panelUntuk === p.id) { panelUntuk = null; modePanel = null; }
+        else { panelUntuk = p.id; modePanel = 'nama'; }
+        render();
+      });
+      tb.appendChild(menu);
+      r.appendChild(tb);
+      wadah.appendChild(r);
+      if (panelUntuk === p.id) wadah.appendChild(panelProfil(p));
+    });
+
+    renderGrup();
+    renderAktivitas();
+  }
+
+  function tombolAksi(teks, utama, fn) {
+    var b = el('button', utama ? 'btn-utama btn-kecil' : 'btn-hantu btn-kecil', teks);
+    b.addEventListener('click', fn);
+    return b;
+  }
+
+  function unixKeLokal(unix) {
+    if (!unix || unix <= 0) return '';
+    var d = new Date(unix * 1000);
+    function p2(n) { return (n < 10 ? '0' : '') + n; }
+    return d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate()) +
+           'T' + p2(d.getHours()) + ':' + p2(d.getMinutes());
+  }
+  function lokalKeUnix(v) {
+    if (!v) return 0;
+    var t = new Date(v).getTime();
+    return isNaN(t) ? 0 : Math.floor(t / 1000);
+  }
+
+  function panelProfil(p) {
+    var pan = el('div', 'panel-kecil tampil');
+    if (modePanel === 'hapus') {
+      pan.appendChild(el('span', 'teks', T.confirmDel.replace('{name}', p.nama)));
+      var bHapus = tombolAksi(T.del, false, function(){
+        panggil('hapus_profil', { id: p.id }).then(function(){
+          panelUntuk = null; modePanel = null; muat();
+        }).catch(function(err){ alert(T.fail + err); });
+      });
+      bHapus.className = 'btn-bahaya btn-kecil';
+      pan.appendChild(bHapus);
+      pan.appendChild(tombolAksi(T.cancel, false, function(){
+        panelUntuk = null; modePanel = null; render();
+      }));
+      return pan;
+    }
+    pan.classList.add('kolom');
+
+    // Baris ganti nama + hapus (perilaku lama, tidak berubah).
+    var barisNama = el('div', 'medis');
+    var inp = document.createElement('input');
+    inp.value = p.nama; inp.maxLength = 30;
+    barisNama.appendChild(inp);
+    barisNama.appendChild(tombolAksi(T.save, true, function(){
+      var baru = inp.value.trim();
+      if (baru && baru !== p.nama) {
+        panggil('ganti_nama', { id: p.id, nama: baru }).then(function(){
+          panelUntuk = null; modePanel = null; muat();
+        }).catch(function(err){ alert(T.fail + err); });
+      } else { panelUntuk = null; modePanel = null; render(); }
+    }));
+    var bDel = tombolAksi(T.del, false, function(){
+      modePanel = 'hapus'; render();
+    });
+    bDel.className = 'btn-bahaya btn-kecil';
+    barisNama.appendChild(bDel);
+    barisNama.appendChild(tombolAksi(T.cancel, false, function(){
+      panelUntuk = null; modePanel = null; render();
+    }));
+    pan.appendChild(barisNama);
+
+    // Formulir meta Hub: grup, catatan, reset limit, persen, sementara.
+    var form = el('div', 'medis');
+    function kolom(labelTeks, input, kelas) {
+      var lab = el('label', '', '');
+      lab.appendChild(document.createTextNode(labelTeks));
+      if (kelas) input.classList.add(kelas);
+      lab.appendChild(input);
+      return lab;
+    }
+    var inGrup = document.createElement('input');
+    inGrup.value = p.grup || ''; inGrup.maxLength = 40;
+    inGrup.setAttribute('list', 'opsi-grup');
+    form.appendChild(kolom(T.grpLabel, inGrup, 'grup'));
+    var inCatatan = document.createElement('input');
+    inCatatan.value = p.catatan || ''; inCatatan.maxLength = 120;
+    form.appendChild(kolom(T.noteLabel, inCatatan, 'catatan-in'));
+    var inReset = document.createElement('input');
+    inReset.type = 'datetime-local';
+    inReset.value = unixKeLokal(p.reset_unix);
+    form.appendChild(kolom(T.resetLabel, inReset, ''));
+    var inPersen = document.createElement('input');
+    inPersen.type = 'number'; inPersen.min = '0'; inPersen.max = '100';
+    inPersen.placeholder = T.pctAuto;
+    inPersen.value = p.persen >= 0 ? String(p.persen) : '';
+    form.appendChild(kolom(T.pctLabel, inPersen, 'persen'));
+    var labCek = el('label', 'cek');
+    var inSementara = document.createElement('input');
+    inSementara.type = 'checkbox';
+    inSementara.checked = !!p.sementara;
+    labCek.appendChild(inSementara);
+    labCek.appendChild(document.createTextNode(T.tempLabel));
+    form.appendChild(labCek);
+    var infoSimpan = el('span', 'tersimpan', '');
+    var bSimpan = tombolAksi(T.save, true, function(){
+      var persen = inPersen.value === '' ? -1 : parseInt(inPersen.value, 10);
+      if (isNaN(persen)) persen = -1;
+      panggil('simpan_meta_profil', {
+        id: p.id,
+        grup: inGrup.value.trim(),
+        catatan: inCatatan.value.trim(),
+        resetUnix: lokalKeUnix(inReset.value),
+        persen: persen,
+        sementara: inSementara.checked,
+        avatar: avatarKini
+      }).then(function(){
+        infoSimpan.textContent = T.savedMsg;
+        setTimeout(function(){ muat(); }, 450);
+      }).catch(function(err){ alert(T.fail + err); });
+    });
+    form.appendChild(bSimpan);
+    form.appendChild(infoSimpan);
+    pan.appendChild(form);
+    // Baris avatar: pemilik bisa memasang gambar yang sama dengan
+    // avatar akun Muse profil ini; kosong = inisial bawaan.
+    var avatarKini = p.avatar || '';
+    var formAvatar = el('div', 'medis');
+    var pratinjau = el('div', 'avatar');
+    pratinjau.style.width = '42px'; pratinjau.style.height = '42px'; pratinjau.style.flexBasis = '42px';
+    function segarkanPratinjau() {
+      isiAvatar(pratinjau, { nama: p.nama, avatar: avatarKini, status: p.status }, baris.indexOf(p));
+    }
+    segarkanPratinjau();
+    formAvatar.appendChild(pratinjau);
+    var inputAvatar = document.createElement('input');
+    inputAvatar.type = 'file';
+    inputAvatar.accept = 'image/*';
+    inputAvatar.style.display = 'none';
+    inputAvatar.addEventListener('change', function() {
+      prosesAvatar(inputAvatar.files && inputAvatar.files[0], function(dataUrl) {
+        avatarKini = dataUrl;
+        segarkanPratinjau();
+      });
+    });
+    formAvatar.appendChild(inputAvatar);
+    var labAvatar = el('label', '', '');
+    labAvatar.appendChild(document.createTextNode(T.avatarLabel || 'Profile avatar'));
+    formAvatar.appendChild(labAvatar);
+    formAvatar.appendChild(tombolAksi(T.avatarPick || 'Choose image...', false, function(){ inputAvatar.click(); }));
+    formAvatar.appendChild(tombolAksi(T.avatarRemove || 'Remove avatar', false, function() {
+      avatarKini = '';
+      segarkanPratinjau();
+    }));
+    pan.appendChild(formAvatar);
+
+    return pan;
+  }
+
+  function bukaSplit(id) {
+    panggil('buka_split', { id: id }).then(function(){ muat(); })
+      .catch(function(err){ alert(T.fail + err); });
+  }
+  function tutupSplit() {
+    panggil('tutup_split').then(function(){ muat(); })
+      .catch(function(err){ alert(T.fail + err); });
+  }
+
+  function renderGrup() {
+    var wadah = document.getElementById('daftar-grup');
+    if (!wadah) return;
+    wadah.innerHTML = '';
+    var namaGrup = {};
+    baris.forEach(function(p){ if (p.grup) namaGrup[p.grup] = true; });
+    Object.keys(jadwal).forEach(function(g){ namaGrup[g] = true; });
+    var dl = document.getElementById('opsi-grup');
+    if (dl) {
+      dl.innerHTML = '';
+      Object.keys(namaGrup).sort().forEach(function(g) {
+        var o = document.createElement('option');
+        o.value = g;
+        dl.appendChild(o);
+      });
+    }
+    Object.keys(namaGrup).sort().forEach(function(g) {
+      var anggota = baris.filter(function(p){ return p.grup === g; }).length;
+      var kartu = el('div', 'grup-kartu');
+      var idn = el('div', 'identitas');
+      idn.appendChild(el('div', 'gnama', g));
+      idn.appendChild(el('div', 'gmeta', T.members.replace('{n}', String(anggota))));
+      kartu.appendChild(idn);
+      kartu.appendChild(el('div', 'spasi'));
+      var jd = jadwal[g] || { bangun: '', tidur: '' };
+      function kolomJam(labelTeks, nilai) {
+        var lab = el('label', '', '');
+        lab.appendChild(document.createTextNode(labelTeks));
+        var inp = document.createElement('input');
+        inp.type = 'time'; inp.value = nilai || '';
+        lab.appendChild(inp);
+        kartu.appendChild(lab);
+        return inp;
+      }
+      var inBangun = kolomJam(T.wakeLabel, jd.bangun);
+      var inTidur = kolomJam(T.sleepLabel, jd.tidur);
+      kartu.appendChild(tombolAksi(T.saveSchedule, false, function(){
+        panggil('simpan_jadwal', { grup: g, bangun: inBangun.value, tidur: inTidur.value })
+          .then(function(){ muat(); })
+          .catch(function(err){ alert(T.fail + err); });
+      }));
+      kartu.appendChild(tombolAksi(T.groupOpen, true, function(){
+        panggil('buka_grup', { grup: g }).then(function(){ muat(); })
+          .catch(function(err){ alert(T.fail + err); });
+      }));
+      wadah.appendChild(kartu);
+    });
+  }
+
+  function renderAktivitas() {
+    var wadah = document.getElementById('daftar-aktivitas');
+    if (!wadah) return;
+    wadah.innerHTML = '';
+    if (!aktivitas.length) {
+      wadah.appendChild(el('div', 'akt-kosong', T.noActivity));
+      return;
+    }
+    aktivitas.slice(0, 12).forEach(function(a) {
+      var r = el('div', 'akt-baris');
+      var d = new Date(a.waktu * 1000);
+      function p2(n) { return (n < 10 ? '0' : '') + n; }
+      var jam = p2(d.getHours()) + ':' + p2(d.getMinutes());
+      var rel = waktuRelatif(a.waktu);
+      r.appendChild(el('span', 'waktu', jam + (rel ? ' · ' + rel : '')));
+      r.appendChild(el('span', 'anama', a.nama));
+      var kataAksi = T['act_' + String(a.aksi).replace(/ /g, '_')] || a.aksi;
+      r.appendChild(el('span', '', kataAksi));
+      wadah.appendChild(r);
+    });
+  }
+
+  function panelBaru() {
+    var pan = el('div', 'panel-kecil tampil');
+    pan.style.marginTop = '12px';
+    pan.style.borderTop = '1px solid var(--garis)';
+    pan.style.borderRadius = '14px';
+    var inp = document.createElement('input');
+    inp.placeholder = T.phNew; inp.maxLength = 30; inp.id = 'input-baru';
+    pan.appendChild(inp);
+    pan.appendChild(tombolAksi(T.create, true, function(){
+      panggil('tandai_hub').then(function(){
+        return panggil('tambah_profil', { nama: inp.value.trim() });
+      }).catch(function(err){ alert(T.fail + err); });
+    }));
+    pan.appendChild(tombolAksi(T.cancel, false, function(){
+      modePanel = null; render();
+    }));
+    setTimeout(function(){ var i2 = document.getElementById('input-baru'); if (i2) i2.focus(); }, 30);
+    return pan;
+  }
+
+  function bukaProfil(id) {
+    panggil('ganti_profil', { profil: id }).then(function(){
+      return panggil('tutup_hub');
+    }).catch(function(err){ alert(T.fail + err); });
+  }
+  function tidurkan(id) {
+    panggil('tidurkan_profil', { id: id }).then(function(){ muat(); })
+      .catch(function(err){ alert(T.fail + err); });
+  }
+
+  function terapkanTeks() {
+    document.getElementById('merek-sub').textContent = T.subMgr;
+    document.getElementById('nav-profil').textContent = T.profiles;
+    document.getElementById('label-profil').textContent = T.profiles;
+    document.getElementById('sub-hub').textContent = T.sub;
+    document.getElementById('btn-kembali').textContent = T.back;
+    document.getElementById('btn-tidur-semua').textContent = T.sleepAll;
+    document.getElementById('btn-tambah').textContent = T.newProfile;
+    document.getElementById('catatan').textContent = T.note;
+    document.getElementById('judul-grup').textContent = T.groupsTitle;
+    document.getElementById('judul-aktivitas').textContent = T.activityTitle;
+    document.getElementById('nota-jadwal').textContent = T.scheduleNote;
+  }
+
+  function muat() {
+    if (!diTauri) {
+      info = MOCK_INFO; baris = MOCK_BARIS;
+      jadwal = MOCK_JADWAL; aktivitas = MOCK_AKTIVITAS;
+      document.getElementById('aplikasi').style.display = '';
+      terapkanTeks(); render();
+      return;
+    }
+    Promise.all([invoke('info_paket'), invoke('data_hub'), invoke('ambil_bahasa'),
+                 invoke('data_jadwal'), invoke('data_aktivitas')]).then(function(h) {
+      info = h[0]; baris = h[1] || [];
+      jadwal = h[3] || {};
+      aktivitas = h[4] || [];
+      var kode = h[2] || 'en';
+      T = KATA[kode] || KATA.en;
+      document.documentElement.lang = kode;
+      if (!info.hub) {
+        document.getElementById('teks-terkunci').textContent = T.locked + info.nama + '.';
+        document.getElementById('kotak-terkunci').style.display = '';
+        return;
+      }
+      document.getElementById('aplikasi').style.display = '';
+      terapkanTeks(); render();
+    }).catch(function(){});
+  }
+
+  document.getElementById('nav-profil').addEventListener('click', function(e){
+    e.preventDefault(); panggil('tutup_hub');
+  });
+  document.getElementById('nav-lisensi').addEventListener('click', function(e){ e.preventDefault(); });
+  document.getElementById('btn-kembali').addEventListener('click', function(){ panggil('tutup_hub'); });
+  document.getElementById('btn-tutup-terkunci').addEventListener('click', function(){ panggil('tutup_hub'); });
+  var tidurSemuaJalan = false;
+  document.getElementById('btn-tidur-semua').addEventListener('click', function(){
+    if (tidurSemuaJalan) return;
+    tidurSemuaJalan = true;
+    panggil('tidurkan_semua').then(function(){ muat(); })
+      .catch(function(err){ alert(T.fail + err); })
+      .finally(function(){ tidurSemuaJalan = false; });
+  });
+  document.getElementById('btn-tambah').addEventListener('click', function(){
+    if (info && info.batas !== null && info.terpakai >= info.batas) {
+      alert(T.limitMsg);
+      return;
+    }
+    modePanel = modePanel === 'baru' ? null : 'baru';
+    panelUntuk = null;
+    render();
+  });
+
+  muat();
+  if (diTauri) setInterval(muat, 5000);
+</script>
+<script>
+  // Animasi masuk Hub: dipanggil Rust tiap kali Hub ditampilkan
+  // (perintah buka_hub dan jalur penanda nyala ulang), plus cadangan
+  // saat webview Hub mendapat fokus.
+  window.__hubMasuk = function () {
+    var el = document.documentElement;
+    el.classList.remove('masuk');
+    void el.offsetWidth;
+    el.classList.add('masuk');
+  };
+  window.addEventListener('focus', function () { window.__hubMasuk(); });
+</script>
+</body>
+</html>

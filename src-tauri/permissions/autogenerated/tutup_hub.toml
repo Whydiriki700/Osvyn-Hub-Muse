@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-tutup-hub"
+description = "Enables the tutup_hub command without any pre-configured scope."
+commands.allow = ["tutup_hub"]
+
+[[permission]]
+identifier = "deny-tutup-hub"
+description = "Denies the tutup_hub command without any pre-configured scope."
+commands.deny = ["tutup_hub"]

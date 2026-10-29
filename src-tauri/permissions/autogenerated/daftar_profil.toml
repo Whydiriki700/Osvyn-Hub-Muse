@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-daftar-profil"
+description = "Enables the daftar_profil command without any pre-configured scope."
+commands.allow = ["daftar_profil"]
+
+[[permission]]
+identifier = "deny-daftar-profil"
+description = "Denies the daftar_profil command without any pre-configured scope."
+commands.deny = ["daftar_profil"]

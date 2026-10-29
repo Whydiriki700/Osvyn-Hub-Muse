@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-profil-aktif"
+description = "Enables the profil_aktif command without any pre-configured scope."
+commands.allow = ["profil_aktif"]
+
+[[permission]]
+identifier = "deny-profil-aktif"
+description = "Denies the profil_aktif command without any pre-configured scope."
+commands.deny = ["profil_aktif"]

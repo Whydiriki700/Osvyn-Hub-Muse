@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-buka-lokasi-unduhan"
+description = "Enables the buka_lokasi_unduhan command without any pre-configured scope."
+commands.allow = ["buka_lokasi_unduhan"]
+
+[[permission]]
+identifier = "deny-buka-lokasi-unduhan"
+description = "Denies the buka_lokasi_unduhan command without any pre-configured scope."
+commands.deny = ["buka_lokasi_unduhan"]

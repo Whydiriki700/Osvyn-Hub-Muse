@@ -1,0 +1,7 @@
+target/
+node_modules/
+src-tauri/gen/
+.cargo/
+*.bak_*
+*.log
+.DS_Store

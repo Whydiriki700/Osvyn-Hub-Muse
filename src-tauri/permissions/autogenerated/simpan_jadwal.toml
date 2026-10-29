@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-simpan-jadwal"
+description = "Enables the simpan_jadwal command without any pre-configured scope."
+commands.allow = ["simpan_jadwal"]
+
+[[permission]]
+identifier = "deny-simpan-jadwal"
+description = "Denies the simpan_jadwal command without any pre-configured scope."
+commands.deny = ["simpan_jadwal"]
