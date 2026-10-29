@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://osvyn-dadd6.vercel.app/logo.png" alt="Osvyn logo" width="420">
+</p>
+
 # Osvyn
 
 Multi-account manager for Muse on Windows 10 and 11. Osvyn runs many
